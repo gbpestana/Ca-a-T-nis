@@ -35,6 +35,8 @@ jobs:
         env:
           WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
           CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           RESUMO: ${{ inputs.resumo }}
         run: |
           if [ "$RESUMO" = "true" ]; then python monitor.py --resumo; else python monitor.py; fi

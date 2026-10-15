@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
 Caça-tênis: monitora preço e estoque de tênis em lojas confiáveis
-e avisa no WhatsApp (via CallMeBot) quando aparece um preço bom no seu tamanho.
+e avisa no Telegram e/ou WhatsApp quando aparece um preço bom no seu tamanho.
 
 Uso:
   python monitor.py              # rodada normal (só avisa se tiver oferta boa)
-  python monitor.py --resumo     # manda no WhatsApp o melhor preço atual de cada alvo
+  python monitor.py --resumo     # manda o melhor preço atual de cada alvo
   python monitor.py --sem-envio  # roda tudo mas só imprime as mensagens (teste)
 """
 from __future__ import annotations
@@ -368,22 +368,48 @@ def msg_resumo(ofertas: list[Oferta], alvos: list[dict], cfg: dict, inicial: boo
     return "\n".join(linhas)
 
 
-def enviar_whatsapp(texto: str, sem_envio: bool) -> bool:
-    fone, chave = os.getenv("WHATSAPP_PHONE"), os.getenv("CALLMEBOT_APIKEY")
-    if sem_envio or not (fone and chave):
-        motivo = "--sem-envio" if sem_envio else "secrets WHATSAPP_PHONE/CALLMEBOT_APIKEY ausentes"
+def _telegram(texto: str, token: str, chat_id: str) -> None:
+    # *negrito* (formato do WhatsApp) -> <b>negrito</b> (HTML do Telegram)
+    html = texto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    html = re.sub(r"\*([^*\n]+)\*", r"<b>\1</b>", html)
+    r = _sessao.post(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        json={"chat_id": chat_id, "text": html, "parse_mode": "HTML"},
+        timeout=25,
+        **_KW,
+    )
+    if r.status_code != 200:
+        raise RuntimeError(f"HTTP {r.status_code}: {r.text[:200]}")
+
+
+def _whatsapp(texto: str, fone: str, chave: str) -> None:
+    baixar("https://api.callmebot.com/whatsapp.php?"
+           f"phone={quote(fone)}&text={quote(texto)}&apikey={quote(chave)}")
+    time.sleep(4)  # o CallMeBot não gosta de rajadas
+
+
+def enviar(texto: str, sem_envio: bool) -> bool:
+    """Manda a mensagem em todos os canais configurados (Telegram e/ou WhatsApp).
+    Devolve True se chegou em pelo menos um."""
+    canais = []
+    if os.getenv("TELEGRAM_TOKEN") and os.getenv("TELEGRAM_CHAT_ID"):
+        canais.append(("Telegram", lambda: _telegram(texto, os.environ["TELEGRAM_TOKEN"],
+                                                     os.environ["TELEGRAM_CHAT_ID"])))
+    if os.getenv("WHATSAPP_PHONE") and os.getenv("CALLMEBOT_APIKEY"):
+        canais.append(("WhatsApp", lambda: _whatsapp(texto, os.environ["WHATSAPP_PHONE"],
+                                                     os.environ["CALLMEBOT_APIKEY"])))
+    if sem_envio or not canais:
+        motivo = "--sem-envio" if sem_envio else "nenhum canal configurado nos secrets"
         print(f"\n----- mensagem (não enviada: {motivo}) -----\n{texto}\n")
         return False
-    url = ("https://api.callmebot.com/whatsapp.php?"
-           f"phone={quote(fone)}&text={quote(texto)}&apikey={quote(chave)}")
     ok = False
-    try:
-        baixar(url)
-        print("  → WhatsApp enviado")
-        ok = True
-    except Exception as e:
-        print(f"  ! falha ao enviar WhatsApp: {e}")
-    time.sleep(4)  # o CallMeBot não gosta de rajadas
+    for nome, mandar in canais:
+        try:
+            mandar()
+            print(f"  → {nome} enviado")
+            ok = True
+        except Exception as e:
+            print(f"  ! falha ao enviar {nome}: {e}")
     return ok
 
 
@@ -410,7 +436,7 @@ def resumo_actions(ofertas: list[Oferta], erros: list[str], alertas) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--resumo", action="store_true", help="manda o melhor preço atual de cada alvo")
-    ap.add_argument("--sem-envio", action="store_true", help="não manda WhatsApp, só imprime")
+    ap.add_argument("--sem-envio", action="store_true", help="não manda mensagem, só imprime")
     args = ap.parse_args()
 
     cfg = yaml.safe_load((RAIZ / "config.yaml").read_text(encoding="utf-8"))
@@ -442,10 +468,10 @@ def main() -> int:
     alertas = decidir(ofertas, estado, cfg, agora)
     inicial = not estado.get("iniciado")
     if args.resumo or inicial:
-        if enviar_whatsapp(msg_resumo(ofertas, alvos, cfg, inicial), args.sem_envio):
+        if enviar(msg_resumo(ofertas, alvos, cfg, inicial), args.sem_envio):
             estado["iniciado"] = True  # só conta como "ligado" se a mensagem chegou
     for o, motivos in alertas:
-        enviar_whatsapp(msg_alerta(o, motivos, cfg), args.sem_envio)
+        enviar(msg_alerta(o, motivos, cfg), args.sem_envio)
 
     salvar(estado, ofertas, agora)
     resumo_actions(ofertas, erros, alertas)

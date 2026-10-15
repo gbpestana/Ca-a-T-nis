@@ -1,6 +1,6 @@
 # 👟 Caça-tênis
 
-Monitor de preço e estoque de tênis em lojas oficiais e autorizadas (Nike, Artwalk, Authentic Feet, Magic Feet). Ele te avisa no WhatsApp quando aparece um preço bom **no seu tamanho**.
+Monitor de preço e estoque de tênis em lojas oficiais e autorizadas (Nike, Artwalk, Authentic Feet, Magic Feet). Ele te avisa no **Telegram** e/ou no **WhatsApp** quando aparece um preço bom **no seu tamanho**.
 
 Roda sozinho no GitHub Actions, de graça, a cada 3 horas. Não depende do seu computador ligado.
 
@@ -17,10 +17,20 @@ Na **primeira rodada** você recebe uma mensagem "Caça-tênis ligado!" com o me
 
 ## Instalação (uma vez só)
 
-### 1. Ative o CallMeBot no seu WhatsApp
+### 1. Configure onde quer receber os avisos
+
+Configure pelo menos um canal. Se os dois estiverem configurados, ele manda nos dois.
+
+**Telegram (recomendado, funciona na hora)**
+1. No Telegram, abra o **@BotFather**, mande `/newbot` e escolha um nome (ex.: `Caça-tênis do Gabriel`) e um usuário terminado em `bot`.
+2. O BotFather te responde com um **token** (algo como `123456:ABC-...`). Guarde.
+3. Abra a conversa com o seu bot novo e mande qualquer mensagem (ex.: `oi`).
+4. No navegador, abra `https://api.telegram.org/botSEU_TOKEN/getUpdates` (troque `SEU_TOKEN` pelo token). Procure `"chat":{"id":` e anote o número que vem logo depois. Esse é o seu **chat id**.
+
+**WhatsApp (via CallMeBot, quando houver vaga)**
 1. Abra <https://www.callmebot.com/blog/free-api-whatsapp-messages/> e salve nos contatos o número indicado lá.
 2. Mande para esse contato a mensagem que a página pede (`I allow callmebot to send me messages`).
-3. Você recebe de volta uma **apikey**. Guarde.
+3. Você recebe de volta uma **apikey**.
 
 ### 2. Suba o projeto no GitHub
 Crie um repositório **privado** (ex.: `caca-tenis`) e envie estes arquivos. A pasta `.github/` é obrigatória: é ela que agenda o monitor.
@@ -38,11 +48,13 @@ No repositório: **Settings → Secrets and variables → Actions → New reposi
 
 | Nome | Valor |
 |---|---|
-| `WHATSAPP_PHONE` | seu número com DDI, ex.: `+5511999998888` |
-| `CALLMEBOT_APIKEY` | a apikey do passo 1 |
+| `TELEGRAM_TOKEN` | o token do BotFather |
+| `TELEGRAM_CHAT_ID` | o seu chat id |
+| `WHATSAPP_PHONE` | (opcional) seu número com DDI, ex.: `+5511999998888` |
+| `CALLMEBOT_APIKEY` | (opcional) a apikey do CallMeBot |
 
 ### 4. Primeira rodada
-**Actions → Monitor de preços → Run workflow.** Em ~1 minuto chega a mensagem no WhatsApp. Depois disso ele roda sozinho a cada 3h.
+**Actions → Monitor de preços → Run workflow.** Em ~1 minuto chega a mensagem "Caça-tênis ligado!". Depois disso ele roda sozinho a cada 3h.
 
 ## Adicionar ou remover tênis
 
@@ -83,5 +95,5 @@ Também dá para editar `alvos.yaml` direto no GitHub.
 ```bash
 pip install -r requirements.txt
 python monitor.py --sem-envio   # imprime as mensagens em vez de mandar
-python monitor.py --resumo      # manda o resumo atual no WhatsApp (com as variáveis de ambiente)
+python monitor.py --resumo      # manda o resumo atual (com as variáveis de ambiente dos canais)
 ```
