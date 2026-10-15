@@ -1,0 +1,15 @@
+{
+  "data": "2026-10-15T18:33-03:00",
+  "ofertas": 7,
+  "por_loja": {
+    "nike": 0,
+    "artwalk": 7,
+    "authentic-feet": 0,
+    "magic-feet": 0
+  },
+  "alertas": 0,
+  "erros": [
+    "nike / Air Jordan 4 Retro: https://www.nike.com.br/busca?term=air%20jordan%204%20retro -> HTTP 403",
+    "nike / Air Jordan 3 Retro: https://www.nike.com.br/busca?term=air%20jordan%203%20retro -> HTTP 403"
+  ]
+}
