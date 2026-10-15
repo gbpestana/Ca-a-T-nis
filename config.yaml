@@ -1,0 +1,68 @@
+# Configurações gerais do monitor.
+# A lista de tênis fica em alvos.yaml (edite lá ou use o workflow "Gerenciar lista").
+
+tamanho: "41"
+
+# Inclui modelos femininos na busca? (a numeração BR é a mesma, mas a forma muda)
+incluir_feminino: false
+
+alerta:
+  # Preço cheio de referência de um Retro na Nike BR.
+  preco_referencia: 1799.99
+  # Alerta sempre que o preço ficar pelo menos X% abaixo da referência.
+  desconto_minimo_pct: 35
+  # Alerta quando um par no seu tamanho bater o MENOR preço já registrado para aquele alvo.
+  bater_minimo_historico: true
+  # Quantas leituras um alvo precisa ter antes de valer a regra do histórico
+  # (evita alerta falso logo no começo, quando o histórico ainda está vazio).
+  leituras_minimas_historico: 8
+
+# Palavras que eliminam um produto (comparadas sem acento e em minúsculas).
+excluir_sempre:
+  - rm          # Air Jordan 4 RM não é o Retro
+  - infantil
+  - juvenil
+  - baby
+  - bebe
+  - gs
+  - td
+  - ps
+  - chinelo
+  - slide
+  - camiseta
+  - meia
+  - bone
+
+# Palavras ignoradas ao comparar o nome do alvo com o nome do produto
+# (as lojas nem sempre escrevem "Retro" ou "Tênis" no nome).
+palavras_opcionais: [tenis, retro, og, masculino, unissex]
+
+lojas:
+  nike:
+    nome: Nike
+    tipo: nike
+    ativa: true
+    cupons_promobit: nike
+  artwalk:
+    nome: Artwalk
+    tipo: vtex
+    ativa: true
+    dominio: www.artwalk.com.br
+    cupons_promobit: artwalk
+  authentic-feet:
+    nome: Authentic Feet
+    tipo: vtex
+    ativa: true
+    dominio: www.authenticfeet.com.br
+    cupons_promobit: authentic-feet
+  magic-feet:
+    nome: Magic Feet
+    tipo: vtex
+    ativa: true
+    dominio: www.magicfeet.com.br
+    cupons_promobit: null
+
+# Quantos cupons recentes (no máximo) mandar junto com o alerta, e até quantos dias de idade.
+cupons:
+  maximo: 3
+  dias: 21
