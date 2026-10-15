@@ -251,7 +251,45 @@ def coletar_promobit(nome_loja: str, loja: dict, alvo: dict, cfg: dict) -> list[
     return ofertas
 
 
-COLETORES = {"vtex": coletar_vtex, "nike": coletar_nike, "promobit": coletar_promobit}
+_promobit_slug: dict[str, str] = {}  # "promobit:Netshoes" -> "netshoes" (para buscar cupons)
+
+
+def coletar_promobit_busca(nome_loja: str, loja: dict, alvo: dict, cfg: dict) -> list[Oferta]:
+    """Busca o termo no Promobit e fica só com promoções ATIVAS de lojas da lista
+    `lojas_permitidas`. Cobre lojas que bloqueiam o GitHub (Nike, Centauro, Netshoes...).
+    Não informa estoque por tamanho (tem_tamanho=None)."""
+    d = baixar(f"https://api.promobit.com.br/search?q={quote(alvo['busca'])}", json_=True)
+    permitidas = {normalizar(x) for x in loja.get("lojas_permitidas", [])}
+    limite = datetime.now(FUSO) - timedelta(days=loja.get("dias", 3))
+    ofertas = []
+    for of in d.get("active_offers") or []:
+        loja_nome = (of.get("store_name") or "").strip()
+        titulo = of.get("offer_title") or ""
+        if normalizar(loja_nome) not in permitidas or not of.get("offer_price"):
+            continue
+        if not corresponde(titulo, alvo, cfg):
+            continue
+        if any(x in (of.get("offer_status_name") or "").upper() for x in ("EXPIR", "ENCERR", "FINISH")):
+            continue
+        try:
+            pub = datetime.strptime(of["offer_published"], "%Y-%m-%dT%H:%M:%S%z")
+        except Exception:
+            continue
+        if pub < limite:
+            continue
+        chave_loja = f"promobit:{loja_nome}"
+        if of.get("store_param"):
+            _promobit_slug[chave_loja] = of["store_param"]
+        url = f"https://www.promobit.com.br/oferta/{of.get('offer_slug') or of.get('offer_id')}/"
+        ofertas.append(Oferta(alvo["nome"], chave_loja, titulo.strip(), "", url,
+                              float(of["offer_price"]),
+                              float(of["offer_old_price"]) if of.get("offer_old_price") else None,
+                              None))
+    return ofertas
+
+
+COLETORES = {"vtex": coletar_vtex, "nike": coletar_nike, "promobit": coletar_promobit,
+             "promobit_busca": coletar_promobit_busca}
 
 # ---------------------------------------------------------------- cupons
 
@@ -322,17 +360,19 @@ def salvar(estado: dict, ofertas: list[Oferta], agora: datetime) -> None:
 # ---------------------------------------------------------------- decisão
 
 
-def decidir(ofertas: list[Oferta], estado: dict, cfg: dict, agora: datetime):
+def decidir(ofertas: list[Oferta], estado: dict, cfg: dict, agora: datetime,
+            alvos: list[dict] | None = None):
     """Separa o que é urgente do que pode esperar o resumo do dia.
 
-    - imediatos: promoção ÓTIMA (desconto >= desconto_otimo_pct sobre o preço de
-      referência). Vai na hora para o Telegram.
+    - imediatos: promoção ÓTIMA (desconto >= desconto_otimo_pct sobre o preço
+      cheio do próprio produto, ou sobre o `preco_referencia` do alvo, se houver).
+      Vai na hora para o Telegram.
     - destaques: novo menor preço do histórico (sem ser ótimo). Fica guardado em
       estado["pendentes"] e sai no resumo diário.
     """
     a = cfg["alerta"]
-    ref = a["preco_referencia"]
-    lim_otimo = ref * (1 - a["desconto_otimo_pct"] / 100)
+    pct_otimo = a["desconto_otimo_pct"]
+    ref_alvo = {x["nome"]: x.get("preco_referencia") for x in (alvos or [])}
     imediatos = []
 
     por_alvo: dict[str, list[Oferta]] = {}
@@ -346,7 +386,8 @@ def decidir(ofertas: list[Oferta], estado: dict, cfg: dict, agora: datetime):
         for o in sorted(lista, key=lambda o: o.preco):
             if o.tem_tamanho is False:
                 continue
-            otimo = o.preco <= lim_otimo
+            ref = ref_alvo.get(o.alvo) or o.preco_cheio
+            otimo = bool(ref) and o.preco <= ref * (1 - pct_otimo / 100)
             recorde = (o.tem_tamanho and a["bater_minimo_historico"] and historico_ok
                        and minimo_ant is not None and o.preco < minimo_ant - 0.01)
             if not (otimo or recorde) or not _deve_avisar(o, estado, agora):
@@ -390,7 +431,16 @@ def hora_do_resumo(estado: dict, cfg: dict, agora: datetime) -> bool:
 
 
 def _nome_loja(o, cfg) -> str:
-    return cfg["lojas"].get(o.loja, {}).get("nome", o.loja)
+    chave = o if isinstance(o, str) else o.loja
+    if chave.startswith("promobit:"):
+        return f"{chave.split(':', 1)[1]} (via Promobit)"
+    return cfg["lojas"].get(chave, {}).get("nome", chave)
+
+
+def _slug_cupons(chave: str, cfg) -> str | None:
+    if chave.startswith("promobit:"):
+        return _promobit_slug.get(chave)
+    return cfg["lojas"].get(chave, {}).get("cupons_promobit")
 
 
 def msg_alerta(o: Oferta, motivos: list[str], cfg: dict) -> str:
@@ -407,7 +457,7 @@ def msg_alerta(o: Oferta, motivos: list[str], cfg: dict) -> str:
         "🔥 " + "; ".join(motivos),
         f"🔗 {o.url}",
     ]
-    linhas += _linhas_cupons(cfg["lojas"].get(o.loja, {}).get("cupons_promobit"), cfg)
+    linhas += _linhas_cupons(_slug_cupons(o.loja, cfg), cfg)
     return "\n".join(linhas)
 
 
@@ -443,14 +493,15 @@ def msg_resumo(ofertas: list[Oferta], alvos: list[dict], estado: dict, cfg: dict
         for p in sorted(pend, key=lambda p: p["preco"]):
             ap = f' "{p["apelido"]}"' if p["apelido"] else ""
             linhas.append(f"• {p['produto']}{ap} – {brl(p['preco'])} na "
-                          f"{cfg['lojas'].get(p['loja'], {}).get('nome', p['loja'])} ({p['motivo']})")
+                          f"{_nome_loja(p['loja'], cfg)} ({p['motivo']})")
             linhas.append(f"  {p['url']}")
 
     sem_tam = sorted([o for o in ofertas if o.tem_tamanho is None], key=lambda o: o.preco)
     if sem_tam:
         linhas += ["", "📣 *Promoções divulgadas no Promobit* (confira o seu número):"]
-        for o in sem_tam[:5]:
-            linhas.append(f"• {o.produto} – {brl(o.preco)} ({_nome_loja(o, cfg)})")
+        for o in sem_tam[:6]:
+            desc = f" (-{o.desconto_pct:.0f}%)" if o.desconto_pct >= 1 else ""
+            linhas.append(f"• {o.produto} – {brl(o.preco)}{desc} na {_nome_loja(o, cfg)}")
             linhas.append(f"  {o.url}")
     return "\n".join(linhas)
 
@@ -565,7 +616,7 @@ def executar(forcar_resumo: bool = False, somente: list[str] | None = None,
                 print(f"  ! erro: {e}")
             time.sleep(1.5)
 
-    imediatos = decidir(ofertas, estado, cfg, agora)
+    imediatos = decidir(ofertas, estado, cfg, agora, alvos)
 
     # 1) promoção ótima: avisa na hora
     for o, motivos in imediatos:
@@ -588,7 +639,8 @@ def executar(forcar_resumo: bool = False, somente: list[str] | None = None,
     (DADOS / "ultima_execucao.json").write_text(json.dumps({
         "data": agora.isoformat(timespec="minutes"),
         "ofertas": len(ofertas),
-        "por_loja": {l: sum(1 for o in ofertas if o.loja == l) for l in cfg["lojas"]},
+        "por_loja": {l: sum(1 for o in ofertas if o.loja == l)
+                     for l in sorted({o.loja for o in ofertas} | set(cfg["lojas"]))},
         "imediatos": len(imediatos),
         "pendentes_para_resumo": len(estado["pendentes"]),
         "erros": erros,

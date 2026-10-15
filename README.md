@@ -1,6 +1,6 @@
 # 👟 Caça-tênis
 
-Monitor de preço e estoque de tênis em lojas oficiais e autorizadas (Nike, Artwalk, Authentic Feet, Magic Feet). Ele te avisa no **Telegram** e/ou no **WhatsApp** quando aparece um preço bom **no seu tamanho**.
+Monitor de preço e estoque de tênis em lojas oficiais e autorizadas. Ele te avisa no **Telegram** e/ou no **WhatsApp** quando aparece um preço bom **no seu tamanho**.
 
 Roda sozinho no GitHub Actions, de graça. Não depende do seu computador ligado.
 
@@ -8,9 +8,11 @@ Roda sozinho no GitHub Actions, de graça. Não depende do seu computador ligado
 
 - **Quando verifica:** as lojas são verificadas **3 vezes por dia**, por volta de **8h, 14h e 20h**.
 - **Resumo do dia:** chega uma vez por dia, na verificação da noite. Ele traz o melhor preço atual de cada tênis no seu tamanho, as quedas de preço do dia e as promoções da Nike divulgadas no Promobit.
-- **Aviso na hora:** só para **promoção ótima**, ou seja, preço pelo menos **35% abaixo** do preço cheio de um Retro (R$ 1.799,99). O aviso traz link, preço e os cupons recentes daquela loja.
+- **Aviso na hora:** só para **promoção ótima**, ou seja, preço pelo menos **35% abaixo** do preço cheio do próprio produto. O aviso traz link, preço e os cupons recentes daquela loja.
 - **Novo menor preço:** o histórico passa a valer depois de 6 leituras, uns 2 dias. Um novo menor preço que não seja "ótimo" entra no resumo do dia em vez de te interromper.
-- **Nike:** ela bloqueia acessos vindos do GitHub. Por isso o monitor lê as promoções da Nike publicadas pela comunidade do **Promobit**. Nesse caso o estoque do seu número não é verificado, e o aviso diz isso.
+- **Lojas lidas direto, com estoque do seu número verificado:** Artwalk, Authentic Feet, Magic Feet, Ostore (multimarcas), New Balance, Fila, Mizuno e Olympikus.
+- **Lojas lidas via Promobit:** Nike, Centauro, Netshoes, Zattini, Dafiti, Adidas, Puma, Vans e outras da lista `lojas_permitidas`. Essas lojas bloqueiam acessos do GitHub, então o monitor busca as promoções ativas publicadas pela comunidade do **Promobit**. Nesses casos o estoque do seu número não é verificado, e o aviso diz isso. Marketplaces como Amazon, Mercado Livre e Shopee ficam de fora por causa de vendedores terceiros.
+- **Testar se uma loja nova funciona:** use **Actions → Diagnóstico de lojas**.
 - **Sem repetição:** o mesmo par não é avisado de novo, a não ser que o preço caia mais ou que passe uma semana.
 
 ## Instalação (uma vez só)

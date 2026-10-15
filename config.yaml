@@ -7,9 +7,9 @@ tamanho: "41"
 incluir_feminino: false
 
 alerta:
-  # Preço cheio de referência de um Retro na Nike BR.
-  preco_referencia: 1799.99
-  # PROMOÇÃO ÓTIMA: pelo menos X% abaixo da referência -> avisa NA HORA.
+  # PROMOÇÃO ÓTIMA: pelo menos X% abaixo do preço cheio do produto -> avisa NA HORA.
+  # (Para fixar uma referência em um tênis, ponha `preco_referencia: 1799.99`
+  # naquele item do alvos.yaml.)
   desconto_otimo_pct: 35
   # Novo menor preço do histórico (sem ser ótimo) -> entra no resumo do dia.
   bater_minimo_historico: true
@@ -43,16 +43,7 @@ excluir_sempre:
 palavras_opcionais: [tenis, retro, og, masculino, unissex]
 
 lojas:
-  nike:
-    nome: Nike (via Promobit)
-    # A Nike bloqueia acessos vindos do GitHub, então lemos as promoções da Nike
-    # publicadas no Promobit (sem estoque por tamanho). Para ler direto do site
-    # (ex.: rodando no seu computador), troque para "tipo: nike".
-    tipo: promobit
-    promobit: nike
-    dias: 2          # ignora promoções publicadas há mais de 2 dias
-    ativa: true
-    cupons_promobit: nike
+  # ---- Lojas lidas direto (estoque do seu tamanho é verificado) ----
   artwalk:
     nome: Artwalk
     tipo: vtex
@@ -71,6 +62,69 @@ lojas:
     ativa: true
     dominio: www.magicfeet.com.br
     cupons_promobit: null
+  ostore:
+    nome: Ostore
+    tipo: vtex
+    ativa: true
+    dominio: www.ostore.com.br
+    cupons_promobit: null
+  new-balance:
+    nome: New Balance
+    tipo: vtex
+    ativa: true
+    dominio: www.newbalance.com.br
+    cupons_promobit: new-balance
+  fila:
+    nome: Fila
+    tipo: vtex
+    ativa: true
+    dominio: www.fila.com.br
+    cupons_promobit: fila
+  mizuno:
+    nome: Mizuno
+    tipo: vtex
+    ativa: true
+    dominio: www.mizuno.com.br
+    cupons_promobit: mizuno
+  olympikus:
+    nome: Olympikus
+    tipo: vtex
+    ativa: true
+    dominio: www.olympikus.com.br
+    cupons_promobit: olympikus
+
+  # ---- Promobit: promoções ativas de lojas que bloqueiam o GitHub ----
+  # (Nike, Centauro, Netshoes...). Estoque do tamanho NÃO é verificado.
+  # Só entram ofertas vendidas por estas lojas (marketplaces como Amazon,
+  # Mercado Livre e Shopee ficam de fora por causa de vendedores terceiros).
+  promobit:
+    nome: Promobit
+    tipo: promobit_busca
+    ativa: true
+    dias: 3          # ignora promoções publicadas há mais de 3 dias
+    lojas_permitidas:
+      - Nike
+      - Centauro
+      - Netshoes
+      - Zattini
+      - Dafiti
+      - Adidas
+      - Puma
+      - Vans
+      - New Balance
+      - Fila
+      - Asics
+      - Mizuno
+      - Olympikus
+      - Artwalk
+      - Authentic Feet
+      - Magic Feet
+      - Ostore
+      - Maze
+      - Gdlp
+      - Converse
+      - Reebok
+      - Under Armour
 
 # Quantos cupons recentes (no máximo) mandar junto com o alerta, e até quantos dias de idade.
 cupons:
