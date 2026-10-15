@@ -2,18 +2,16 @@
 
 Monitor de preço e estoque de tênis em lojas oficiais e autorizadas (Nike, Artwalk, Authentic Feet, Magic Feet). Ele te avisa no **Telegram** e/ou no **WhatsApp** quando aparece um preço bom **no seu tamanho**.
 
-Roda sozinho no GitHub Actions, de graça, a cada 3 horas. Não depende do seu computador ligado.
+Roda sozinho no GitHub Actions, de graça. Não depende do seu computador ligado.
 
-## Como ele decide avisar
+## Como funciona
 
-Um par só gera alerta se o seu tamanho estiver em estoque **e** pelo menos uma destas condições for verdadeira:
-
-1. **Desconto real:** o preço está ≥ 35% abaixo do preço cheio de um Retro (R$ 1.799,99).
-2. **Recorde do histórico:** é o menor preço já registrado para aquele tênis. Essa regra só começa a valer depois de 8 leituras, para o histórico ter alguma base.
-
-O alerta traz link, preço, desconto e os cupons mais recentes daquela loja publicados no Promobit. Os cupons são para testar no carrinho, porque a loja decide se valem para o produto. O mesmo par não é avisado de novo, a não ser que o preço caia mais ou que passe uma semana.
-
-Na **primeira rodada** você recebe uma mensagem "Caça-tênis ligado!" com o melhor preço atual de cada modelo.
+- **Quando verifica:** as lojas são verificadas **3 vezes por dia**, por volta de **8h, 14h e 20h**.
+- **Resumo do dia:** chega uma vez por dia, na verificação da noite. Ele traz o melhor preço atual de cada tênis no seu tamanho, as quedas de preço do dia e as promoções da Nike divulgadas no Promobit.
+- **Aviso na hora:** só para **promoção ótima**, ou seja, preço pelo menos **35% abaixo** do preço cheio de um Retro (R$ 1.799,99). O aviso traz link, preço e os cupons recentes daquela loja.
+- **Novo menor preço:** o histórico passa a valer depois de 6 leituras, uns 2 dias. Um novo menor preço que não seja "ótimo" entra no resumo do dia em vez de te interromper.
+- **Nike:** ela bloqueia acessos vindos do GitHub. Por isso o monitor lê as promoções da Nike publicadas pela comunidade do **Promobit**. Nesse caso o estoque do seu número não é verificado, e o aviso diz isso.
+- **Sem repetição:** o mesmo par não é avisado de novo, a não ser que o preço caia mais ou que passe uma semana.
 
 ## Instalação (uma vez só)
 
@@ -54,32 +52,29 @@ No repositório: **Settings → Secrets and variables → Actions → New reposi
 | `CALLMEBOT_APIKEY` | (opcional) a apikey do CallMeBot |
 
 ### 4. Primeira rodada
-**Actions → Monitor de preços → Run workflow.** Em ~1 minuto chega a mensagem "Caça-tênis ligado!". Depois disso ele roda sozinho a cada 3h.
+**Actions → Monitor de preços → Run workflow.** Em ~1 minuto chega a mensagem "Caça-tênis ligado!". Depois disso ele roda sozinho.
 
 ## Adicionar ou remover tênis
 
-**Pelo celular ou navegador:** vá em **Actions → Gerenciar lista de tênis → Run workflow** e preencha:
+**Pelo Telegram (mais fácil):** use o menu de comandos do seu bot, no botão `/` ou `☰` ao lado do campo de texto.
 
-- **acao:** `adicionar`, `remover` ou `listar`
-- **nome:** ex.: `Air Jordan 5 Retro`
-- **busca** (opcional): o termo usado nas lojas, se for diferente do nome
-- **excluir** (opcional): palavras que eliminam produtos, ex.: `low,se`
+| Comando | O que faz |
+|---|---|
+| `/novo Air Jordan 5 Retro` | adiciona e já te manda os preços dele |
+| `/novo` | o bot pergunta qual tênis |
+| `/remover 2` ou `/remover` | remove pelo número da lista, ou o bot pergunta qual |
+| `/lista` | mostra o que está sendo monitorado |
+| `/resumo` | manda o resumo de preços agora |
 
-Depois de adicionar ou remover, ele já manda um resumo com os preços da lista nova.
+O bot confere seus comandos **a cada 30 minutos**, então a resposta pode levar até meia hora. Só mensagens do seu chat (`TELEGRAM_CHAT_ID`) são aceitas.
 
-**Pelo terminal:**
-```bash
-python gerenciar.py listar
-python gerenciar.py adicionar "Air Jordan 11 Retro" --excluir low
-python gerenciar.py remover "Air Jordan 3 Retro"
-```
-
-Também dá para editar `alvos.yaml` direto no GitHub.
+**Pelo GitHub:** vá em **Actions → Gerenciar lista de tênis → Run workflow**. Por lá também dá para informar palavras a excluir da busca, ex.: `low,se`.
 
 ## Ajustes (`config.yaml`)
 
 - `tamanho`: seu número.
-- `alerta.desconto_minimo_pct`: o desconto mínimo para avisar (padrão 35%).
+- `alerta.desconto_otimo_pct`: o desconto que conta como promoção ótima e é avisado na hora (padrão 35%).
+- `resumo_diario.hora`: a partir de que hora sai o resumo do dia (padrão 19, ou seja, na verificação das 20h).
 - `incluir_feminino`: incluir modelos femininos.
 - `excluir_sempre`: palavras que eliminam produtos. Por padrão já elimina RM, infantil, GS etc.
 - `lojas`: liga e desliga lojas. Qualquer loja na plataforma VTEX entra com `tipo: vtex` e o `dominio`.

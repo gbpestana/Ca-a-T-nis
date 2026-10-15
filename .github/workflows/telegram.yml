@@ -1,0 +1,58 @@
+name: Comandos do Telegram
+
+# Confere a cada 30 min se você mandou algum comando para o bot
+# (/novo, /remover, /lista, /resumo). Se não tiver nada novo, termina em segundos.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: caca-tenis
+  cancel-in-progress: false
+
+jobs:
+  comandos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+      CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tem mensagem nova?
+        id: checar
+        run: |
+          OFF=$(jq -r '.offset // 0' dados/telegram.json 2>/dev/null || echo 0)
+          N=$(curl -s "https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates?offset=${OFF}&timeout=0" | jq '.result | length' 2>/dev/null || echo 0)
+          echo "mensagens novas: $N"
+          if [ "${N:-0}" -gt 0 ] || [ ! -f dados/telegram.json ]; then echo "tem=sim" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/setup-python@v5
+        if: steps.checar.outputs.tem == 'sim'
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Responder comandos
+        if: steps.checar.outputs.tem == 'sim'
+        run: |
+          pip install -q -r requirements.txt
+          python bot.py
+
+      - name: Salvar no repositório
+        if: steps.checar.outputs.tem == 'sim'
+        run: |
+          git config user.name "caca-tenis-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add alvos.yaml dados/
+          git diff --cached --quiet && exit 0
+          git commit -m "telegram: comandos"
+          git pull --rebase --autostash
+          git push

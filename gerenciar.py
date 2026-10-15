@@ -16,6 +16,10 @@ import yaml
 ARQ = Path(__file__).resolve().parent / "alvos.yaml"
 
 
+def chave(s: str) -> str:
+    return " ".join(s.lower().split())
+
+
 def carregar() -> list[dict]:
     if not ARQ.exists():
         return []
@@ -40,7 +44,6 @@ def main() -> int:
     args = ap.parse_args()
 
     alvos = carregar()
-    chave = lambda s: " ".join(s.lower().split())
 
     if args.acao == "listar":
         if not alvos:

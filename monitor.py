@@ -123,7 +123,7 @@ class Oferta:
     url: str
     preco: float  # melhor preço (Pix, quando a loja informa)
     preco_cheio: float | None
-    tem_tamanho: bool
+    tem_tamanho: bool | None  # None = loja não informa estoque por tamanho
 
     @property
     def desconto_pct(self) -> float:
@@ -223,7 +223,35 @@ def coletar_nike(nome_loja: str, loja: dict, alvo: dict, cfg: dict) -> list[Ofer
     return ofertas
 
 
-COLETORES = {"vtex": coletar_vtex, "nike": coletar_nike}
+def coletar_promobit(nome_loja: str, loja: dict, alvo: dict, cfg: dict) -> list[Oferta]:
+    """Promoções da loja publicadas pela comunidade do Promobit. Não informa
+    estoque por tamanho (tem_tamanho=None): o aviso pede para conferir o número."""
+    slug = loja["promobit"]
+    dados = next_data(baixar(f"https://www.promobit.com.br/cupons/loja/{slug}/"))
+    brutos = dados["props"]["pageProps"]["serverOffers"]["offers"]
+    limite = datetime.now(FUSO) - timedelta(days=loja.get("dias", 2))
+    ofertas = []
+    for of in brutos:
+        titulo = of.get("offerTitle", "")
+        if not corresponde(titulo, alvo, cfg) or not of.get("offerPrice"):
+            continue
+        if any(x in (of.get("offerStatusName") or "").upper() for x in ("EXPIR", "ENCERR", "FINISH")):
+            continue
+        try:
+            pub = datetime.strptime(of["offerPublished"], "%Y-%m-%dT%H:%M:%S%z")
+        except Exception:
+            continue
+        if pub < limite:
+            continue
+        url = f"https://www.promobit.com.br/oferta/{of.get('offerSlug', of.get('offerId'))}/"
+        ofertas.append(Oferta(alvo["nome"], nome_loja, titulo.strip(), "", url,
+                              float(of["offerPrice"]),
+                              float(of["offerOldPrice"]) if of.get("offerOldPrice") else None,
+                              None))
+    return ofertas
+
+
+COLETORES = {"vtex": coletar_vtex, "nike": coletar_nike, "promobit": coletar_promobit}
 
 # ---------------------------------------------------------------- cupons
 
@@ -266,9 +294,13 @@ def cupons(slug: str | None, cfg: dict) -> list[dict]:
 
 
 def carregar_estado() -> dict:
-    if ESTADO.exists():
-        return json.loads(ESTADO.read_text())
-    return {"iniciado": False, "alvos": {}, "alertas": {}}
+    est = json.loads(ESTADO.read_text()) if ESTADO.exists() else {}
+    est.setdefault("iniciado", False)
+    est.setdefault("alvos", {})
+    est.setdefault("alertas", {})
+    est.setdefault("pendentes", [])   # destaques guardados para o resumo do dia
+    est.setdefault("ultimo_resumo", None)
+    return est
 
 
 def salvar(estado: dict, ofertas: list[Oferta], agora: datetime) -> None:
@@ -279,49 +311,63 @@ def salvar(estado: dict, ofertas: list[Oferta], agora: datetime) -> None:
         w = csv.writer(f)
         if novo:
             w.writerow(["data", "alvo", "loja", "produto", "apelido", "preco",
-                        "preco_cheio", f"tem_tamanho", "url"])
+                        "preco_cheio", "tem_tamanho", "url"])
         for o in ofertas:
             w.writerow([agora.isoformat(timespec="minutes"), o.alvo, o.loja, o.produto,
                         o.apelido, f"{o.preco:.2f}",
                         f"{o.preco_cheio:.2f}" if o.preco_cheio else "",
-                        int(o.tem_tamanho), o.url])
+                        "" if o.tem_tamanho is None else int(o.tem_tamanho), o.url])
 
 
-# ---------------------------------------------------------------- decisão e mensagens
+# ---------------------------------------------------------------- decisão
 
 
 def decidir(ofertas: list[Oferta], estado: dict, cfg: dict, agora: datetime):
-    """Devolve [(oferta, [motivos])] para mandar no WhatsApp e atualiza o estado."""
+    """Separa o que é urgente do que pode esperar o resumo do dia.
+
+    - imediatos: promoção ÓTIMA (desconto >= desconto_otimo_pct sobre o preço de
+      referência). Vai na hora para o Telegram.
+    - destaques: novo menor preço do histórico (sem ser ótimo). Fica guardado em
+      estado["pendentes"] e sai no resumo diário.
+    """
     a = cfg["alerta"]
-    limite_desc = a["preco_referencia"] * (1 - a["desconto_minimo_pct"] / 100)
-    alertas = []
+    ref = a["preco_referencia"]
+    lim_otimo = ref * (1 - a["desconto_otimo_pct"] / 100)
+    imediatos = []
+
     por_alvo: dict[str, list[Oferta]] = {}
     for o in ofertas:
-        if o.tem_tamanho:
-            por_alvo.setdefault(o.alvo, []).append(o)
+        por_alvo.setdefault(o.alvo, []).append(o)
 
     for nome_alvo, lista in por_alvo.items():
         info = estado["alvos"].setdefault(nome_alvo, {"leituras": 0, "minimo": None})
         minimo_ant = info["minimo"]
         historico_ok = info["leituras"] >= a["leituras_minimas_historico"]
         for o in sorted(lista, key=lambda o: o.preco):
-            motivos = []
-            if o.preco <= limite_desc:
-                pct = 100 * (1 - o.preco / a["preco_referencia"])
-                motivos.append(f"{pct:.0f}% abaixo do preço cheio de um Retro")
-            if a["bater_minimo_historico"] and historico_ok and minimo_ant is not None \
-                    and o.preco < minimo_ant - 0.01:
-                motivos.append(f"menor preço já registrado (antes: {brl(minimo_ant)})")
-            if motivos and _deve_avisar(o, estado, agora):
-                alertas.append((o, motivos))
-                estado["alertas"][o.url] = {"preco": o.preco, "data": agora.isoformat()}
-        menor = min(o.preco for o in lista)
-        if info["minimo"] is None or menor < info["minimo"]:
-            info["minimo"], info["minimo_em"] = menor, agora.isoformat(timespec="minutes")
-
-    for alvo in {o.alvo for o in ofertas} | set(por_alvo):
-        estado["alvos"].setdefault(alvo, {"leituras": 0, "minimo": None})["leituras"] += 1
-    return alertas
+            if o.tem_tamanho is False:
+                continue
+            otimo = o.preco <= lim_otimo
+            recorde = (o.tem_tamanho and a["bater_minimo_historico"] and historico_ok
+                       and minimo_ant is not None and o.preco < minimo_ant - 0.01)
+            if not (otimo or recorde) or not _deve_avisar(o, estado, agora):
+                continue
+            estado["alertas"][o.url] = {"preco": o.preco, "data": agora.isoformat()}
+            if otimo:
+                pct = 100 * (1 - o.preco / ref)
+                motivos = [f"{pct:.0f}% abaixo do preço cheio ({brl(ref)})"]
+                if recorde:
+                    motivos.append(f"menor preço já registrado (antes: {brl(minimo_ant)})")
+                imediatos.append((o, motivos))
+            else:
+                d = asdict(o)
+                d["motivo"] = f"novo menor preço (antes: {brl(minimo_ant)})"
+                d["quando"] = agora.isoformat(timespec="minutes")
+                estado["pendentes"].append(d)
+        verificadas = [o.preco for o in lista if o.tem_tamanho]
+        if verificadas and (info["minimo"] is None or min(verificadas) < info["minimo"]):
+            info["minimo"], info["minimo_em"] = min(verificadas), agora.isoformat(timespec="minutes")
+        info["leituras"] += 1
+    return imediatos
 
 
 def _deve_avisar(o: Oferta, estado: dict, agora: datetime) -> bool:
@@ -333,39 +379,83 @@ def _deve_avisar(o: Oferta, estado: dict, agora: datetime) -> bool:
     return agora - datetime.fromisoformat(ant["data"]) > timedelta(days=7)
 
 
+def hora_do_resumo(estado: dict, cfg: dict, agora: datetime) -> bool:
+    """Um resumo por dia: na primeira rodada a partir de resumo_diario.hora que
+    ainda não mandou o resumo de hoje."""
+    hoje = agora.date().isoformat()
+    return agora.hour >= cfg["resumo_diario"]["hora"] and estado.get("ultimo_resumo") != hoje
+
+
+# ---------------------------------------------------------------- mensagens
+
+
+def _nome_loja(o, cfg) -> str:
+    return cfg["lojas"].get(o.loja, {}).get("nome", o.loja)
+
+
 def msg_alerta(o: Oferta, motivos: list[str], cfg: dict) -> str:
     titulo = o.produto + (f' "{o.apelido}"' if o.apelido else "")
+    tam = (f"📏 Tamanho {cfg['tamanho']} disponível" if o.tem_tamanho
+           else f"📏 Estoque do {cfg['tamanho']} não verificado — confira na loja")
     linhas = [
+        f"🚨 *PROMOÇÃO*",
         f"👟 *{titulo}*",
-        f"🏬 {cfg['lojas'][o.loja].get('nome', o.loja)}",
+        f"🏬 {_nome_loja(o, cfg)}",
         f"💰 *{brl(o.preco)}*" + (f" (de {brl(o.preco_cheio)}, -{o.desconto_pct:.0f}%)"
                                  if o.desconto_pct >= 1 else ""),
-        f"📏 Tamanho {cfg['tamanho']} disponível",
+        tam,
         "🔥 " + "; ".join(motivos),
         f"🔗 {o.url}",
     ]
-    cs = cupons(cfg["lojas"][o.loja].get("cupons_promobit"), cfg)
-    if cs:
-        linhas.append("🎟️ Cupons recentes p/ testar no carrinho:")
-        linhas += [f"   • *{c['codigo']}* – {c['titulo'][:70]}" for c in cs]
+    linhas += _linhas_cupons(cfg["lojas"].get(o.loja, {}).get("cupons_promobit"), cfg)
     return "\n".join(linhas)
 
 
-def msg_resumo(ofertas: list[Oferta], alvos: list[dict], cfg: dict, inicial: bool) -> str:
-    cab = "✅ *Caça-tênis ligado!*" if inicial else "📋 *Resumo do caça-tênis*"
-    linhas = [cab, f"Tamanho {cfg['tamanho']} · melhores preços agora:", ""]
+def _linhas_cupons(slug, cfg) -> list[str]:
+    cs = cupons(slug, cfg)
+    if not cs:
+        return []
+    return ["🎟️ Cupons recentes p/ testar no carrinho:",
+            *[f"   • *{c['codigo']}* – {c['titulo'][:70]}" for c in cs]]
+
+
+def msg_resumo(ofertas: list[Oferta], alvos: list[dict], estado: dict, cfg: dict,
+               titulo: str) -> str:
+    tam = cfg["tamanho"]
+    linhas = [titulo, f"Tamanho {tam} · melhor preço de cada um agora:", ""]
     for alvo in alvos:
         com = sorted([o for o in ofertas if o.alvo == alvo["nome"] and o.tem_tamanho],
                      key=lambda o: o.preco)
         if not com:
-            linhas.append(f"• *{alvo['nome']}*: nada no {cfg['tamanho']} agora")
+            linhas.append(f"• *{alvo['nome']}*: nada no {tam} agora")
             continue
         o = com[0]
         ap = f' "{o.apelido}"' if o.apelido else ""
-        linhas.append(f"• *{alvo['nome']}*{ap} – {brl(o.preco)} na {cfg['lojas'][o.loja].get('nome', o.loja)}"
-                      f" ({len(com)} opç{'ão' if len(com) == 1 else 'ões'} no {cfg['tamanho']})")
+        desc = f" (-{o.desconto_pct:.0f}%)" if o.desconto_pct >= 1 else ""
+        linhas.append(f"• *{alvo['nome']}*{ap} – {brl(o.preco)}{desc} na {_nome_loja(o, cfg)}"
+                      f" · {len(com)} opç{'ão' if len(com) == 1 else 'ões'} no {tam}")
         linhas.append(f"  {o.url}")
+
+    nomes = {a["nome"] for a in alvos}
+    pend = [p for p in estado.get("pendentes", []) if p["alvo"] in nomes]
+    if pend:
+        linhas += ["", "🔻 *Quedas de preço desde o último resumo:*"]
+        for p in sorted(pend, key=lambda p: p["preco"]):
+            ap = f' "{p["apelido"]}"' if p["apelido"] else ""
+            linhas.append(f"• {p['produto']}{ap} – {brl(p['preco'])} na "
+                          f"{cfg['lojas'].get(p['loja'], {}).get('nome', p['loja'])} ({p['motivo']})")
+            linhas.append(f"  {p['url']}")
+
+    sem_tam = sorted([o for o in ofertas if o.tem_tamanho is None], key=lambda o: o.preco)
+    if sem_tam:
+        linhas += ["", "📣 *Promoções divulgadas no Promobit* (confira o seu número):"]
+        for o in sem_tam[:5]:
+            linhas.append(f"• {o.produto} – {brl(o.preco)} ({_nome_loja(o, cfg)})")
+            linhas.append(f"  {o.url}")
     return "\n".join(linhas)
+
+
+# ---------------------------------------------------------------- envio
 
 
 def _telegram(texto: str, token: str, chat_id: str) -> None:
@@ -374,7 +464,8 @@ def _telegram(texto: str, token: str, chat_id: str) -> None:
     html = re.sub(r"\*([^*\n]+)\*", r"<b>\1</b>", html)
     r = _sessao.post(
         f"https://api.telegram.org/bot{token}/sendMessage",
-        json={"chat_id": chat_id, "text": html, "parse_mode": "HTML"},
+        json={"chat_id": chat_id, "text": html, "parse_mode": "HTML",
+              "disable_web_page_preview": True},
         timeout=25,
         **_KW,
     )
@@ -388,7 +479,7 @@ def _whatsapp(texto: str, fone: str, chave: str) -> None:
     time.sleep(4)  # o CallMeBot não gosta de rajadas
 
 
-def enviar(texto: str, sem_envio: bool) -> bool:
+def enviar(texto: str, sem_envio: bool = False) -> bool:
     """Manda a mensagem em todos os canais configurados (Telegram e/ou WhatsApp).
     Devolve True se chegou em pelo menos um."""
     canais = []
@@ -413,36 +504,45 @@ def enviar(texto: str, sem_envio: bool) -> bool:
     return ok
 
 
-def resumo_actions(ofertas: list[Oferta], erros: list[str], alertas) -> None:
+def resumo_actions(ofertas: list[Oferta], erros: list[str], imediatos) -> None:
     caminho = os.getenv("GITHUB_STEP_SUMMARY")
     if not caminho:
         return
     out = ["## Caça-tênis", ""]
     if erros:
         out += ["**Falhas:**", *[f"- {e}" for e in erros], ""]
-    out += [f"**Alertas enviados:** {len(alertas)}", "",
+    out += [f"**Alertas imediatos:** {len(imediatos)}", "",
             "| Alvo | Loja | Produto | Preço | Cheio | No tamanho |", "|---|---|---|---|---|---|"]
     for o in sorted(ofertas, key=lambda o: (o.alvo, not o.tem_tamanho, o.preco)):
         nome = o.produto + (f" ({o.apelido})" if o.apelido else "")
+        tam = {True: "✅", False: "—", None: "?"}[o.tem_tamanho]
         out.append(f"| {o.alvo} | {o.loja} | [{nome}]({o.url}) | {brl(o.preco)} | "
-                   f"{brl(o.preco_cheio)} | {'✅' if o.tem_tamanho else '—'} |")
+                   f"{brl(o.preco_cheio)} | {tam} |")
     with open(caminho, "a", encoding="utf-8") as f:
         f.write("\n".join(out) + "\n")
 
 
-# ---------------------------------------------------------------- main
+# ---------------------------------------------------------------- execução
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--resumo", action="store_true", help="manda o melhor preço atual de cada alvo")
-    ap.add_argument("--sem-envio", action="store_true", help="não manda mensagem, só imprime")
-    args = ap.parse_args()
-
+def carregar_config() -> tuple[dict, list[dict]]:
     cfg = yaml.safe_load((RAIZ / "config.yaml").read_text(encoding="utf-8"))
     alvos = (yaml.safe_load((RAIZ / "alvos.yaml").read_text(encoding="utf-8")) or {}).get("alvos") or []
+    return cfg, alvos
+
+
+def executar(forcar_resumo: bool = False, somente: list[str] | None = None,
+             sem_envio: bool = False, titulo: str | None = None) -> int:
+    """Uma rodada completa. `somente` restringe a alguns alvos (usado pelo /novo
+    do Telegram) — nesse caso o resumo é só desses alvos e não conta como o diário."""
+    cfg, alvos = carregar_config()
+    if somente:
+        chave = lambda s: " ".join(s.lower().split())
+        alvos = [a for a in alvos if chave(a["nome"]) in {chave(x) for x in somente}]
     if not alvos:
-        print("alvos.yaml está vazio — nada para monitorar.")
+        print("Nenhum alvo para monitorar.")
+        if forcar_resumo:
+            enviar("📭 A lista está vazia. Use /novo para adicionar um tênis.", sem_envio)
         return 0
 
     agora = datetime.now(FUSO)
@@ -457,34 +557,56 @@ def main() -> int:
             print(f"[{alvo['nome']}] {nome_loja}...")
             try:
                 achadas = COLETORES[loja["tipo"]](nome_loja, loja, alvo, cfg)
-                print(f"  {len(achadas)} produto(s), {sum(o.tem_tamanho for o in achadas)} "
-                      f"com tamanho {cfg['tamanho']}")
+                print(f"  {len(achadas)} produto(s), {sum(bool(o.tem_tamanho) for o in achadas)} "
+                      f"com tamanho {cfg['tamanho']} confirmado")
                 ofertas += achadas
             except Exception as e:
                 erros.append(f"{nome_loja} / {alvo['nome']}: {e}")
                 print(f"  ! erro: {e}")
             time.sleep(1.5)
 
-    alertas = decidir(ofertas, estado, cfg, agora)
+    imediatos = decidir(ofertas, estado, cfg, agora)
+
+    # 1) promoção ótima: avisa na hora
+    for o, motivos in imediatos:
+        enviar(msg_alerta(o, motivos, cfg), sem_envio)
+
+    # 2) resumo: pedido, de boas-vindas ou o diário
     inicial = not estado.get("iniciado")
-    if args.resumo or inicial:
-        if enviar(msg_resumo(ofertas, alvos, cfg, inicial), args.sem_envio):
+    diario = not somente and hora_do_resumo(estado, cfg, agora)
+    if forcar_resumo or inicial or diario:
+        if titulo is None:
+            titulo = ("✅ *Caça-tênis ligado!*" if inicial else
+                      "📊 *Resumo do dia — caça-tênis*" if diario else "📋 *Resumo agora*")
+        if enviar(msg_resumo(ofertas, alvos, estado, cfg, titulo), sem_envio):
             estado["iniciado"] = True  # só conta como "ligado" se a mensagem chegou
-    for o, motivos in alertas:
-        enviar(msg_alerta(o, motivos, cfg), args.sem_envio)
+            if diario:  # boas-vindas e /resumo não substituem o resumo do dia
+                estado["ultimo_resumo"] = agora.date().isoformat()
+                estado["pendentes"] = []
 
     salvar(estado, ofertas, agora)
     (DADOS / "ultima_execucao.json").write_text(json.dumps({
         "data": agora.isoformat(timespec="minutes"),
         "ofertas": len(ofertas),
         "por_loja": {l: sum(1 for o in ofertas if o.loja == l) for l in cfg["lojas"]},
-        "alertas": len(alertas),
+        "imediatos": len(imediatos),
+        "pendentes_para_resumo": len(estado["pendentes"]),
         "erros": erros,
     }, ensure_ascii=False, indent=2))
-    resumo_actions(ofertas, erros, alertas)
-    print(f"\nFim: {len(ofertas)} ofertas lidas, {len(alertas)} alerta(s), {len(erros)} erro(s).")
+    resumo_actions(ofertas, erros, imediatos)
+    print(f"\nFim: {len(ofertas)} ofertas lidas, {len(imediatos)} alerta(s) imediato(s), "
+          f"{len(erros)} erro(s).")
     # Falha o job só se NENHUMA loja respondeu (assim o GitHub te avisa por e-mail).
     return 1 if erros and not ofertas else 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--resumo", action="store_true", help="manda o resumo agora")
+    ap.add_argument("--alvo", action="append", help="roda só para este alvo (pode repetir)")
+    ap.add_argument("--sem-envio", action="store_true", help="não manda mensagem, só imprime")
+    args = ap.parse_args()
+    return executar(forcar_resumo=args.resumo, somente=args.alvo, sem_envio=args.sem_envio)
 
 
 if __name__ == "__main__":

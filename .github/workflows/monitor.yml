@@ -2,13 +2,14 @@ name: Monitor de preços
 
 on:
   schedule:
-    - cron: "23 */3 * * *"   # a cada 3 horas (horário UTC)
+    # ~7h50, 13h50 e 19h50 (horário de Brasília; o cron do GitHub é em UTC)
+    - cron: "52 10,16,22 * * *"
   workflow_dispatch:
     inputs:
       resumo:
-        description: "Mandar resumo com o melhor preço atual de cada tênis"
+        description: "Mandar o resumo agora (além do resumo diário)"
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: write
