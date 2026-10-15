@@ -368,20 +368,23 @@ def msg_resumo(ofertas: list[Oferta], alvos: list[dict], cfg: dict, inicial: boo
     return "\n".join(linhas)
 
 
-def enviar_whatsapp(texto: str, sem_envio: bool) -> None:
+def enviar_whatsapp(texto: str, sem_envio: bool) -> bool:
     fone, chave = os.getenv("WHATSAPP_PHONE"), os.getenv("CALLMEBOT_APIKEY")
     if sem_envio or not (fone and chave):
         motivo = "--sem-envio" if sem_envio else "secrets WHATSAPP_PHONE/CALLMEBOT_APIKEY ausentes"
         print(f"\n----- mensagem (não enviada: {motivo}) -----\n{texto}\n")
-        return
+        return False
     url = ("https://api.callmebot.com/whatsapp.php?"
            f"phone={quote(fone)}&text={quote(texto)}&apikey={quote(chave)}")
+    ok = False
     try:
         baixar(url)
         print("  → WhatsApp enviado")
+        ok = True
     except Exception as e:
         print(f"  ! falha ao enviar WhatsApp: {e}")
     time.sleep(4)  # o CallMeBot não gosta de rajadas
+    return ok
 
 
 def resumo_actions(ofertas: list[Oferta], erros: list[str], alertas) -> None:
@@ -439,8 +442,8 @@ def main() -> int:
     alertas = decidir(ofertas, estado, cfg, agora)
     inicial = not estado.get("iniciado")
     if args.resumo or inicial:
-        enviar_whatsapp(msg_resumo(ofertas, alvos, cfg, inicial), args.sem_envio)
-        estado["iniciado"] = True
+        if enviar_whatsapp(msg_resumo(ofertas, alvos, cfg, inicial), args.sem_envio):
+            estado["iniciado"] = True  # só conta como "ligado" se a mensagem chegou
     for o, motivos in alertas:
         enviar_whatsapp(msg_alerta(o, motivos, cfg), args.sem_envio)
 
