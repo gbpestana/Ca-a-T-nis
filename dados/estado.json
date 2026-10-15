@@ -2,22 +2,22 @@
   "iniciado": true,
   "alvos": {
     "Air Jordan 4 Retro": {
-      "leituras": 3,
+      "leituras": 4,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "Air Jordan 3 Retro": {
-      "leituras": 3,
+      "leituras": 4,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "vans crosspath": {
-      "leituras": 1,
+      "leituras": 2,
       "minimo": 799.99,
       "minimo_em": "2026-10-15T18:53-03:00"
     }
   },
   "alertas": {},
   "pendentes": [],
-  "ultimo_resumo": null
+  "ultimo_resumo": "2026-10-15"
 }
