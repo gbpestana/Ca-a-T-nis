@@ -1,11 +1,16 @@
 {
-  "data": "2026-10-15T18:44-03:00",
-  "ofertas": 7,
+  "data": "2026-10-15T18:53-03:00",
+  "ofertas": 4,
   "por_loja": {
-    "nike": 0,
-    "artwalk": 7,
+    "artwalk": 3,
     "authentic-feet": 0,
-    "magic-feet": 0
+    "fila": 0,
+    "magic-feet": 0,
+    "mizuno": 0,
+    "new-balance": 0,
+    "olympikus": 0,
+    "ostore": 1,
+    "promobit": 0
   },
   "imediatos": 0,
   "pendentes_para_resumo": 0,
