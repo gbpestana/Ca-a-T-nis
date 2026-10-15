@@ -1,0 +1,16 @@
+{
+  "iniciado": true,
+  "alvos": {
+    "Air Jordan 4 Retro": {
+      "leituras": 1,
+      "minimo": 1799.99,
+      "minimo_em": "2026-10-15T18:32-03:00"
+    },
+    "Air Jordan 3 Retro": {
+      "leituras": 1,
+      "minimo": 1799.99,
+      "minimo_em": "2026-10-15T18:32-03:00"
+    }
+  },
+  "alertas": {}
+}
