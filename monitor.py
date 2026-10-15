@@ -474,6 +474,13 @@ def main() -> int:
         enviar(msg_alerta(o, motivos, cfg), args.sem_envio)
 
     salvar(estado, ofertas, agora)
+    (DADOS / "ultima_execucao.json").write_text(json.dumps({
+        "data": agora.isoformat(timespec="minutes"),
+        "ofertas": len(ofertas),
+        "por_loja": {l: sum(1 for o in ofertas if o.loja == l) for l in cfg["lojas"]},
+        "alertas": len(alertas),
+        "erros": erros,
+    }, ensure_ascii=False, indent=2))
     resumo_actions(ofertas, erros, alertas)
     print(f"\nFim: {len(ofertas)} ofertas lidas, {len(alertas)} alerta(s), {len(erros)} erro(s).")
     # Falha o job só se NENHUMA loja respondeu (assim o GitHub te avisa por e-mail).
