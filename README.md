@@ -68,7 +68,7 @@ No repositório: **Settings → Secrets and variables → Actions → New reposi
 | `/lista` | mostra o que está sendo monitorado |
 | `/resumo` | manda o resumo de preços agora |
 
-O bot confere seus comandos **a cada 30 minutos**, então a resposta pode levar até meia hora. Só mensagens do seu chat (`TELEGRAM_CHAT_ID`) são aceitas.
+O bot confere seus comandos **a cada 5 minutos**. Em horários de pico o GitHub às vezes atrasa um pouco o agendamento. Só mensagens do seu chat (`TELEGRAM_CHAT_ID`) são aceitas.
 
 **Pelo GitHub:** vá em **Actions → Gerenciar lista de tênis → Run workflow**. Por lá também dá para informar palavras a excluir da busca, ex.: `low,se`.
 

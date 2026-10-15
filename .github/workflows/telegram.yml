@@ -1,10 +1,10 @@
 name: Comandos do Telegram
 
-# Confere a cada 30 min se você mandou algum comando para o bot
+# Confere a cada 5 min se você mandou algum comando para o bot
 # (/novo, /remover, /lista, /resumo). Se não tiver nada novo, termina em segundos.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
