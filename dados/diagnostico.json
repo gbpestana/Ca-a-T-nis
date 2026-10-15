@@ -1,0 +1,198 @@
+{
+  "vtex": {
+    "www.vans.com.br": {
+      "ok": false,
+      "erro": "https://www.vans.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.newbalance.com.br": {
+      "ok": true,
+      "exemplo": "Tênis New Balance 373v2 Feminino",
+      "tem_campo_tamanho": true
+    },
+    "www.fila.com.br": {
+      "ok": true,
+      "exemplo": "Tênis Fila Speedrocker Skyfoam Masculino",
+      "tem_campo_tamanho": true
+    },
+    "br.puma.com": {
+      "ok": false,
+      "erro": "https://br.puma.com/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.centauro.com.br": {
+      "ok": false,
+      "erro": "https://www.centauro.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.netshoes.com.br": {
+      "ok": false,
+      "erro": "https://www.netshoes.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.dafiti.com.br": {
+      "ok": false,
+      "erro": "https://www.dafiti.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.zattini.com.br": {
+      "ok": false,
+      "erro": "https://www.zattini.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.adidas.com.br": {
+      "ok": false,
+      "erro": "https://www.adidas.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.asics.com.br": {
+      "ok": true,
+      "exemplo": "Tênis GT-2160 - Cinza/Prata",
+      "tem_campo_tamanho": false
+    },
+    "www.mizuno.com.br": {
+      "ok": true,
+      "exemplo": "Tênis de Corrida Mizuno Goya",
+      "tem_campo_tamanho": true
+    },
+    "www.olympikus.com.br": {
+      "ok": true,
+      "exemplo": "Tênis Olympikus Delta",
+      "tem_campo_tamanho": true
+    },
+    "www.converse.com.br": {
+      "ok": false,
+      "erro": "https://www.converse.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 403"
+    },
+    "www.ostore.com.br": {
+      "ok": true,
+      "exemplo": "Tênis Puma-180",
+      "tem_campo_tamanho": true
+    },
+    "www.overcome.com.br": {
+      "ok": false,
+      "erro": "https://www.overcome.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.gdlp.com.br": {
+      "ok": false,
+      "erro": "https://www.gdlp.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    },
+    "www.maze.com.br": {
+      "ok": false,
+      "erro": "https://www.maze.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 401"
+    },
+    "www.lojavirus.com.br": {
+      "ok": false,
+      "erro": "https://www.lojavirus.com.br/api/catalog_system/pub/products/search?ft=tenis&_from=0&_to=4 -> HTTP 404"
+    }
+  },
+  "promobit": {
+    "centauro": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Centauro"
+      ],
+      "cupons": 40
+    },
+    "netshoes": {
+      "ok": true,
+      "ofertas": 25,
+      "lojas": [
+        "Netshoes"
+      ],
+      "cupons": 40
+    },
+    "dafiti": {
+      "ok": true,
+      "ofertas": 12,
+      "lojas": [
+        "Amazon",
+        "Mercado Livre",
+        "Netshoes"
+      ],
+      "cupons": 0
+    },
+    "zattini": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Zattini"
+      ],
+      "cupons": 40
+    },
+    "puma": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Puma"
+      ],
+      "cupons": 11
+    },
+    "adidas": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Adidas"
+      ],
+      "cupons": 40
+    },
+    "new-balance": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "New Balance"
+      ],
+      "cupons": 29
+    },
+    "newbalance": {
+      "ok": false,
+      "erro": "https://www.promobit.com.br/cupons/loja/newbalance/ -> HTTP 404"
+    },
+    "vans": {
+      "ok": false,
+      "erro": "https://www.promobit.com.br/cupons/loja/vans/ -> HTTP 404"
+    },
+    "fila": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Fila"
+      ],
+      "cupons": 40
+    },
+    "asics": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Asics"
+      ],
+      "cupons": 40
+    },
+    "mizuno": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Mizuno"
+      ],
+      "cupons": 40
+    },
+    "olympikus": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Olympikus"
+      ],
+      "cupons": 40
+    },
+    "artwalk": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Artwalk"
+      ],
+      "cupons": 8
+    },
+    "authentic-feet": {
+      "ok": true,
+      "ofertas": 24,
+      "lojas": [
+        "Authentic Feet"
+      ],
+      "cupons": 5
+    }
+  }
+}
