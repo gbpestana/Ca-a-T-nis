@@ -509,14 +509,15 @@ def msg_resumo(ofertas: list[Oferta], alvos: list[dict], estado: dict, cfg: dict
 # ---------------------------------------------------------------- envio
 
 
-def _telegram(texto: str, token: str, chat_id: str) -> None:
+def _telegram(texto: str, token: str, chat_id: str, teclado: dict | None = None) -> None:
     # *negrito* (formato do WhatsApp) -> <b>negrito</b> (HTML do Telegram)
     html = texto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     html = re.sub(r"\*([^*\n]+)\*", r"<b>\1</b>", html)
     r = _sessao.post(
         f"https://api.telegram.org/bot{token}/sendMessage",
         json={"chat_id": chat_id, "text": html, "parse_mode": "HTML",
-              "disable_web_page_preview": True},
+              "disable_web_page_preview": True,
+              **({"reply_markup": teclado} if teclado else {})},
         timeout=25,
         **_KW,
     )

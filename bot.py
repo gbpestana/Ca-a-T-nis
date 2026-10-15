@@ -7,7 +7,8 @@ Lê os comandos que você manda para o bot no Telegram e responde.
   /remover 2   ou   /remover Air Jordan 3 Retro
   /remover                   -> o bot mostra a lista numerada e pergunta qual
   /lista                     -> mostra o que está sendo monitorado
-  /resumo                    -> manda o resumo de preços agora
+  /atualizar (ou /resumo)    -> verifica as lojas agora e manda os preços
+  Botões fixos no teclado: 🔄 Atualizar · 📋 Lista · ➕ Novo · 🗑️ Remover
   /cancelar                  -> cancela uma pergunta em aberto
   /ajuda
 
@@ -28,7 +29,7 @@ COMANDOS = [
     {"command": "novo", "description": "Adicionar um tênis à lista"},
     {"command": "remover", "description": "Remover um tênis da lista"},
     {"command": "lista", "description": "Ver o que está sendo monitorado"},
-    {"command": "resumo", "description": "Receber o resumo de preços agora"},
+    {"command": "atualizar", "description": "Verificar as lojas agora e mandar os preços"},
     {"command": "cancelar", "description": "Cancelar a pergunta em aberto"},
     {"command": "ajuda", "description": "Como usar"},
 ]
@@ -38,10 +39,22 @@ AJUDA = (
     "/novo – adicionar um tênis (ex.: /novo Air Jordan 5 Retro)\n"
     "/remover – remover um tênis (ex.: /remover 2)\n"
     "/lista – ver o que está sendo monitorado\n"
-    "/resumo – receber os preços agora\n\n"
+    "/atualizar – verificar as lojas agora e mandar os preços\n\n"
+    "Ou use os botões fixos aqui embaixo 👇\n\n"
     "Eu verifico as lojas de manhã, à tarde e à noite, mando *um resumo por dia* "
     "e só aviso na hora se aparecer uma promoção ótima."
 )
+
+
+TECLADO = {
+    "keyboard": [[{"text": "🔄 Atualizar"}, {"text": "📋 Lista"}],
+                 [{"text": "➕ Novo"}, {"text": "🗑️ Remover"}]],
+    "resize_keyboard": True,
+    "is_persistent": True,
+}
+BOTOES = {"🔄 Atualizar": "/atualizar", "📋 Lista": "/lista",
+          "➕ Novo": "/novo", "🗑️ Remover": "/remover"}
+VERSAO_MENU = 2
 
 
 def api(metodo: str, **dados):
@@ -55,7 +68,8 @@ def api(metodo: str, **dados):
 
 
 def responder(texto: str) -> None:
-    monitor._telegram(texto, os.environ["TELEGRAM_TOKEN"], os.environ["TELEGRAM_CHAT_ID"])
+    monitor._telegram(texto, os.environ["TELEGRAM_TOKEN"], os.environ["TELEGRAM_CHAT_ID"],
+                      teclado=TECLADO)
 
 
 def texto_lista(alvos: list[dict]) -> str:
@@ -109,9 +123,10 @@ def main() -> int:
     offset = est.get("offset", 0)
     aguardando = est.get("aguardando")
 
-    if est.get("comandos_v") != 1:  # registra o menu de comandos no Telegram
+    if est.get("comandos_v") != VERSAO_MENU:  # registra menu e botões no Telegram
         api("setMyCommands", commands=COMANDOS)
-        est["comandos_v"] = 1
+        responder("🆕 Agora tem botões fixos aqui embaixo, inclusive o *🔄 Atualizar*.\n\n" + AJUDA)
+        est["comandos_v"] = VERSAO_MENU
 
     novos: list[str] = []
     pedir_resumo = False
@@ -123,6 +138,7 @@ def main() -> int:
         texto = (msg.get("text") or "").strip()
         if not texto:
             continue
+        texto = BOTOES.get(texto, texto)
         print(f"> {texto}")
 
         if texto.startswith("/"):
@@ -151,9 +167,9 @@ def main() -> int:
                         responder(texto_lista(alvos) + "\n\nQual remover? Mande o número.")
                     else:
                         responder(texto_lista(alvos))
-            elif cmd == "resumo":
+            elif cmd in ("resumo", "atualizar", "refresh"):
                 pedir_resumo = True
-                responder("⏳ Buscando os preços, já te mando...")
+                responder("⏳ Verificando as lojas, já te mando os preços...")
             elif cmd == "cancelar":
                 responder("Ok, cancelado.")
             else:
@@ -173,7 +189,7 @@ def main() -> int:
     ESTADO_BOT.write_text(json.dumps(est, ensure_ascii=False, indent=2))
 
     if pedir_resumo:
-        monitor.executar(forcar_resumo=True, titulo="📋 *Resumo agora*")
+        monitor.executar(forcar_resumo=True, titulo="🔄 *Preços atualizados agora*")
     elif novos:
         monitor.executar(forcar_resumo=True, somente=novos, titulo="🆕 *Preços do que você adicionou:*")
     return 0
