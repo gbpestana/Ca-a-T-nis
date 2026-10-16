@@ -1,0 +1,39 @@
+name: Respostas instantâneas (Cloudflare)
+
+# Liga ou desliga o repassador da Cloudflare no Telegram.
+# Rode depois de publicar o Worker, colando o endereço dele (…workers.dev).
+on:
+  workflow_dispatch:
+    inputs:
+      acao:
+        description: "ligar ou desligar"
+        type: choice
+        options: [ligar, desligar]
+        default: ligar
+      url:
+        description: "Endereço do Worker (ex.: https://caca-tenis.seu-nome.workers.dev)"
+        type: string
+        required: false
+
+jobs:
+  webhook:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      ACAO: ${{ inputs.acao }}
+      URL: ${{ inputs.url }}
+    steps:
+      - name: Configurar webhook do Telegram
+        run: |
+          API="https://api.telegram.org/bot${TELEGRAM_TOKEN}"
+          if [ "$ACAO" = "desligar" ]; then
+            curl -s -X POST "$API/deleteWebhook" | jq '{ok, description}'
+          else
+            case "$URL" in https://*) ;; *) echo "::error::Cole o endereço completo do Worker, começando com https://"; exit 1;; esac
+            SEGREDO=$(printf '%s' "$TELEGRAM_TOKEN" | sha256sum | cut -c1-32)
+            curl -s -X POST "$API/setWebhook" -H 'Content-Type: application/json' \
+              -d "$(jq -n --arg u "$URL" --arg s "$SEGREDO" '{url:$u, secret_token:$s, allowed_updates:["message"]}')" \
+              | jq '{ok, description}'
+          fi
+          echo "Situação atual:"
+          curl -s "$API/getWebhookInfo" | jq '.result | {url, pending_update_count, last_error_message}'

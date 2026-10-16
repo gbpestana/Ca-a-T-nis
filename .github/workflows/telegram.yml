@@ -1,8 +1,11 @@
 name: Comandos do Telegram
 
-# Confere a cada 5 min se você mandou algum comando para o bot
-# (/novo, /remover, /lista, /resumo). Se não tiver nada novo, termina em segundos.
+# Com o repassador da Cloudflare ligado, cada comando chega aqui na hora
+# (repository_dispatch). O agendamento é só uma reserva, caso o repassador
+# esteja desligado: confere se há mensagens novas e termina em segundos.
 on:
+  repository_dispatch:
+    types: [telegram]
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -32,7 +35,7 @@ jobs:
           OFF=$(jq -r '.offset // 0' dados/telegram.json 2>/dev/null || echo 0)
           N=$(curl -s "https://api.telegram.org/bot${TELEGRAM_TOKEN}/getUpdates?offset=${OFF}&timeout=0" | jq '.result | length' 2>/dev/null || echo 0)
           echo "mensagens novas: $N"
-          if [ "${N:-0}" -gt 0 ] || [ ! -f dados/telegram.json ] || [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+          if [ "${N:-0}" -gt 0 ] || [ ! -f dados/telegram.json ] || [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
             echo "tem=sim" >> "$GITHUB_OUTPUT"
           fi
 
@@ -44,9 +47,16 @@ jobs:
 
       - name: Responder comandos
         if: steps.checar.outputs.tem == 'sim'
+        env:
+          P_MENSAGEM: ${{ github.event.client_payload.mensagem }}
+          P_RESPOSTA_A: ${{ github.event.client_payload.resposta_a }}
         run: |
           pip install -q -r requirements.txt
-          python bot.py
+          if [ "$GITHUB_EVENT_NAME" = "repository_dispatch" ]; then
+            MENSAGEM="$P_MENSAGEM" RESPOSTA_A="$P_RESPOSTA_A" python bot.py
+          else
+            python bot.py
+          fi
 
       - name: Salvar no repositório
         if: steps.checar.outputs.tem == 'sim'

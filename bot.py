@@ -114,84 +114,105 @@ def remover(arg: str) -> None:
     responder(f"🗑️ Removido: *{alvo['nome']}*\n\n" + texto_lista(gerenciar.carregar()))
 
 
+PERGUNTA_NOVO = "Qual tênis você quer monitorar?"
+PERGUNTA_REMOVER = "Qual remover?"
+
+
+def tratar(texto: str, resposta_a: str, aguardando: str | None,
+           acoes: dict) -> str | None:
+    """Trata uma mensagem. Devolve o novo estado de 'aguardando'.
+    `resposta_a` é o texto da mensagem do bot que você respondeu (se houver)."""
+    texto = BOTOES.get(texto, texto)
+    print(f"> {texto}")
+    if not texto.startswith("/"):
+        if resposta_a.startswith(PERGUNTA_NOVO) or aguardando == "novo":
+            if (n := adicionar(texto)):
+                acoes["novos"].append(n)
+        elif PERGUNTA_REMOVER in resposta_a or aguardando == "remover":
+            remover(texto)
+        else:
+            responder("Use os botões aqui embaixo ou o menu de comandos.\n\n" + AJUDA)
+        return None
+
+    cmd, _, arg = texto.partition(" ")
+    cmd = cmd[1:].split("@")[0].lower()
+    arg = arg.strip()
+    if cmd in ("start", "ajuda", "help"):
+        responder(AJUDA)
+    elif cmd == "lista":
+        responder(texto_lista(gerenciar.carregar()))
+    elif cmd == "novo":
+        if arg:
+            if (n := adicionar(arg)):
+                acoes["novos"].append(n)
+        else:
+            responder(f"{PERGUNTA_NOVO}\nEx.: *Air Jordan 5 Retro*")
+            return "novo"
+    elif cmd == "remover":
+        if arg:
+            remover(arg)
+        else:
+            alvos = gerenciar.carregar()
+            if alvos:
+                responder(texto_lista(alvos) + f"\n\n{PERGUNTA_REMOVER} Mande o número.")
+                return "remover"
+            responder(texto_lista(alvos))
+    elif cmd in ("resumo", "atualizar", "refresh"):
+        acoes["resumo"] = True
+        if not acoes.get("silencioso"):
+            responder("⏳ Verificando as lojas, já te mando os preços...")
+    elif cmd == "cancelar":
+        responder("Ok, cancelado.")
+    else:
+        responder("Não conheço esse comando.\n\n" + AJUDA)
+    return None
+
+
 def main() -> int:
     if not (os.getenv("TELEGRAM_TOKEN") and os.getenv("TELEGRAM_CHAT_ID")):
         print("TELEGRAM_TOKEN / TELEGRAM_CHAT_ID não configurados.")
         return 0
     meu_chat = str(os.environ["TELEGRAM_CHAT_ID"]).strip()
     est = json.loads(ESTADO_BOT.read_text()) if ESTADO_BOT.exists() else {}
-    offset = est.get("offset", 0)
     aguardando = est.get("aguardando")
+    acoes = {"novos": [], "resumo": False}
 
-    if est.get("comandos_v") != VERSAO_MENU:  # registra menu e botões no Telegram
-        api("setMyCommands", commands=COMANDOS)
-        responder("🆕 Agora tem botões fixos aqui embaixo, inclusive o *🔄 Atualizar*.\n\n" + AJUDA)
-        est["comandos_v"] = VERSAO_MENU
+    msg_unica = os.getenv("MENSAGEM")  # veio do repassador (Cloudflare), já confirmada lá
+    if msg_unica is not None:
+        acoes["silencioso"] = True       # o repassador já respondeu "⏳ Recebi"
+        aguardando = tratar(msg_unica.strip(), os.getenv("RESPOSTA_A", ""), None, acoes)
+    else:
+        if est.get("comandos_v") != VERSAO_MENU:  # registra menu e botões no Telegram
+            api("setMyCommands", commands=COMANDOS)
+            responder("🆕 Agora tem botões fixos aqui embaixo, inclusive o *🔄 Atualizar*.\n\n" + AJUDA)
+            est["comandos_v"] = VERSAO_MENU
+        try:
+            updates = api("getUpdates", offset=est.get("offset", 0), timeout=0,
+                          allowed_updates=["message"])
+        except RuntimeError as e:
+            if "409" in str(e) or "webhook" in str(e).lower():
+                print("Respostas instantâneas (webhook) ativas: nada a fazer aqui.")
+                return 0
+            raise
+        for up in updates:
+            est["offset"] = up["update_id"] + 1
+            msg = up.get("message") or {}
+            if str(msg.get("chat", {}).get("id")) != meu_chat:
+                continue  # ignora qualquer outra pessoa
+            texto = (msg.get("text") or "").strip()
+            if texto:
+                resp = ((msg.get("reply_to_message") or {}).get("text") or "")
+                aguardando = tratar(texto, resp, aguardando, acoes)
 
-    novos: list[str] = []
-    pedir_resumo = False
-    for up in api("getUpdates", offset=offset, timeout=0, allowed_updates=["message"]):
-        offset = up["update_id"] + 1
-        msg = up.get("message") or {}
-        if str(msg.get("chat", {}).get("id")) != meu_chat:
-            continue  # ignora qualquer outra pessoa
-        texto = (msg.get("text") or "").strip()
-        if not texto:
-            continue
-        texto = BOTOES.get(texto, texto)
-        print(f"> {texto}")
-
-        if texto.startswith("/"):
-            cmd, _, arg = texto.partition(" ")
-            cmd = cmd[1:].split("@")[0].lower()
-            arg = arg.strip()
-            aguardando = None
-            if cmd in ("start", "ajuda", "help"):
-                responder(AJUDA)
-            elif cmd == "lista":
-                responder(texto_lista(gerenciar.carregar()))
-            elif cmd == "novo":
-                if arg:
-                    if (n := adicionar(arg)):
-                        novos.append(n)
-                else:
-                    aguardando = "novo"
-                    responder("Qual tênis você quer monitorar?\nEx.: *Air Jordan 5 Retro*")
-            elif cmd == "remover":
-                if arg:
-                    remover(arg)
-                else:
-                    alvos = gerenciar.carregar()
-                    if alvos:
-                        aguardando = "remover"
-                        responder(texto_lista(alvos) + "\n\nQual remover? Mande o número.")
-                    else:
-                        responder(texto_lista(alvos))
-            elif cmd in ("resumo", "atualizar", "refresh"):
-                pedir_resumo = True
-                responder("⏳ Verificando as lojas, já te mando os preços...")
-            elif cmd == "cancelar":
-                responder("Ok, cancelado.")
-            else:
-                responder("Não conheço esse comando.\n\n" + AJUDA)
-        elif aguardando == "novo":
-            aguardando = None
-            if (n := adicionar(texto)):
-                novos.append(n)
-        elif aguardando == "remover":
-            aguardando = None
-            remover(texto)
-        else:
-            responder("Use o menu de comandos (botão / ou ☰ ao lado do campo de texto).\n\n" + AJUDA)
-
-    est.update(offset=offset, aguardando=aguardando)
+    est["aguardando"] = aguardando
     monitor.DADOS.mkdir(exist_ok=True)
     ESTADO_BOT.write_text(json.dumps(est, ensure_ascii=False, indent=2))
 
-    if pedir_resumo:
+    if acoes["resumo"]:
         monitor.executar(forcar_resumo=True, titulo="🔄 *Preços atualizados agora*")
-    elif novos:
-        monitor.executar(forcar_resumo=True, somente=novos, titulo="🆕 *Preços do que você adicionou:*")
+    elif acoes["novos"]:
+        monitor.executar(forcar_resumo=True, somente=acoes["novos"],
+                         titulo="🆕 *Preços do que você adicionou:*")
     return 0
 
 
