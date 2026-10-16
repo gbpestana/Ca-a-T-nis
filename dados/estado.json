@@ -15,6 +15,11 @@
       "leituras": 6,
       "minimo": 799.99,
       "minimo_em": "2026-10-15T18:53-03:00"
+    },
+    "Jordan spizike low": {
+      "leituras": 1,
+      "minimo": 1299.99,
+      "minimo_em": "2026-10-16T18:56-03:00"
     }
   },
   "alertas": {},
