@@ -333,6 +333,7 @@ def cupons(slug: str | None, cfg: dict) -> list[dict]:
 
 def carregar_estado() -> dict:
     est = json.loads(ESTADO.read_text()) if ESTADO.exists() else {}
+    est.setdefault("esgotados", {})
     est.setdefault("iniciado", False)
     est.setdefault("alvos", {})
     est.setdefault("alertas", {})
@@ -383,10 +384,23 @@ def decidir(ofertas: list[Oferta], estado: dict, cfg: dict, agora: datetime,
         info = estado["alvos"].setdefault(nome_alvo, {"leituras": 0, "minimo": None})
         minimo_ant = info["minimo"]
         historico_ok = info["leituras"] >= a["leituras_minimas_historico"]
+        esgotados = estado.setdefault("esgotados", {})  # url -> preço quando estava sem o número
         for o in sorted(lista, key=lambda o: o.preco):
             if o.tem_tamanho is False:
+                esgotados[o.url] = {"preco": o.preco, "alvo": o.alvo,
+                                    "desde": esgotados.get(o.url, {}).get("desde",
+                                                                          agora.isoformat(timespec="minutes"))}
                 continue
             ref = ref_alvo.get(o.alvo) or o.preco_cheio
+            # Voltou o seu número num par que estava mais barato que as opções com estoque?
+            antes = esgotados.pop(o.url, None) if o.tem_tamanho else None
+            com_tam = [x.preco for x in lista if x.tem_tamanho and x.url != o.url]
+            if antes and o.desconto_pct >= a.get("desconto_volta_pct", 20) \
+                    and (not com_tam or o.preco < min(com_tam) - 0.01):
+                estado["alertas"][o.url] = {"preco": o.preco, "data": agora.isoformat()}
+                imediatos.append((o, [f"voltou o {cfg['tamanho']} neste par com "
+                                      f"{o.desconto_pct:.0f}% de desconto"]))
+                continue
             otimo = bool(ref) and o.preco <= ref * (1 - pct_otimo / 100)
             recorde = (o.tem_tamanho and a["bater_minimo_historico"] and historico_ok
                        and minimo_ant is not None and o.preco < minimo_ant - 0.01)
@@ -447,8 +461,9 @@ def msg_alerta(o: Oferta, motivos: list[str], cfg: dict) -> str:
     titulo = o.produto + (f' "{o.apelido}"' if o.apelido else "")
     tam = (f"📏 Tamanho {cfg['tamanho']} disponível" if o.tem_tamanho
            else f"📏 Estoque do {cfg['tamanho']} não verificado — confira na loja")
+    voltou = any(m.startswith("voltou o") for m in motivos)
     linhas = [
-        f"🚨 *PROMOÇÃO*",
+        f"🔔 *VOLTOU O SEU NÚMERO*" if voltou else f"🚨 *PROMOÇÃO*",
         f"👟 *{titulo}*",
         f"🏬 {_nome_loja(o, cfg)}",
         f"💰 *{brl(o.preco)}*" + (f" (de {brl(o.preco_cheio)}, -{o.desconto_pct:.0f}%)"
@@ -476,15 +491,24 @@ def msg_resumo(ofertas: list[Oferta], alvos: list[dict], estado: dict, cfg: dict
     for alvo in alvos:
         com = sorted([o for o in ofertas if o.alvo == alvo["nome"] and o.tem_tamanho],
                      key=lambda o: o.preco)
+        sem = sorted([o for o in ofertas if o.alvo == alvo["nome"] and o.tem_tamanho is False],
+                     key=lambda o: o.preco)
         if not com:
             linhas.append(f"• *{alvo['nome']}*: nada no {tam} agora")
-            continue
-        o = com[0]
-        ap = f' "{o.apelido}"' if o.apelido else ""
-        desc = f" (-{o.desconto_pct:.0f}%)" if o.desconto_pct >= 1 else ""
-        linhas.append(f"• *{alvo['nome']}*{ap} – {brl(o.preco)}{desc} na {_nome_loja(o, cfg)}"
-                      f" · {len(com)} opç{'ão' if len(com) == 1 else 'ões'} no {tam}")
-        linhas.append(f"  {o.url}")
+        else:
+            o = com[0]
+            ap = f' "{o.apelido}"' if o.apelido else ""
+            desc = f" (-{o.desconto_pct:.0f}%)" if o.desconto_pct >= 1 else ""
+            linhas.append(f"• *{alvo['nome']}*{ap} – {brl(o.preco)}{desc} na {_nome_loja(o, cfg)}"
+                          f" · {len(com)} opç{'ão' if len(com) == 1 else 'ões'} no {tam}")
+            linhas.append(f"  {o.url}")
+        if sem and (not com or sem[0].preco < com[0].preco - 0.01):
+            x = sem[0]
+            ap = f' "{x.apelido}"' if x.apelido else ""
+            desc = f" (-{x.desconto_pct:.0f}%)" if x.desconto_pct >= 1 else ""
+            linhas.append(f"  💤 Mais barato, mas *sem o {tam}*:{ap} {brl(x.preco)}{desc} na "
+                          f"{_nome_loja(x, cfg)} — te aviso se o {tam} voltar")
+            linhas.append(f"  {x.url}")
 
     nomes = {a["nome"] for a in alvos}
     pend = [p for p in estado.get("pendentes", []) if p["alvo"] in nomes]

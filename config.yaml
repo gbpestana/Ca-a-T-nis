@@ -11,6 +11,9 @@ alerta:
   # (Para fixar uma referência em um tênis, ponha `preco_referencia: 1799.99`
   # naquele item do alvos.yaml.)
   desconto_otimo_pct: 35
+  # Um par que estava mais barato mas SEM o seu número voltou a ter o número,
+  # com pelo menos X% de desconto -> avisa NA HORA.
+  desconto_volta_pct: 20
   # Novo menor preço do histórico (sem ser ótimo) -> entra no resumo do dia.
   bater_minimo_historico: true
   # Quantas leituras um alvo precisa ter antes de valer a regra do histórico
