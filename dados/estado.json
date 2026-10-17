@@ -20,6 +20,11 @@
       "leituras": 3,
       "minimo": 1299.99,
       "minimo_em": "2026-10-16T18:56-03:00"
+    },
+    "Adidas Campus 00": {
+      "leituras": 1,
+      "minimo": 499.99,
+      "minimo_em": "2026-10-17T10:17-03:00"
     }
   },
   "alertas": {},
@@ -35,6 +40,31 @@
       "preco": 779.99,
       "alvo": "Jordan spizike low",
       "desde": "2026-10-16T21:48-03:00"
+    },
+    "https://www.ostore.com.br/tenis-adidas-campus-00s-silver-green-0017513002/p": {
+      "preco": 399.99,
+      "alvo": "Adidas Campus 00",
+      "desde": "2026-10-17T10:17-03:00"
+    },
+    "https://www.ostore.com.br/tenis-adidas-campus-00s-core-blackgum-0012517008/p": {
+      "preco": 499.99,
+      "alvo": "Adidas Campus 00",
+      "desde": "2026-10-17T10:17-03:00"
+    },
+    "https://www.ostore.com.br/tenis-adidas-campus-00s-grey-0012517027/p": {
+      "preco": 699.99,
+      "alvo": "Adidas Campus 00",
+      "desde": "2026-10-17T10:17-03:00"
+    },
+    "https://www.ostore.com.br/tenis-adidas-campus-00s-core-black-cloud-white-0012517026/p": {
+      "preco": 699.99,
+      "alvo": "Adidas Campus 00",
+      "desde": "2026-10-17T10:17-03:00"
+    },
+    "https://www.ostore.com.br/tenis-adias-campus-00s-dark-green--cloud-white-0012517024/p": {
+      "preco": 699.99,
+      "alvo": "Adidas Campus 00",
+      "desde": "2026-10-17T10:17-03:00"
     }
   }
 }
