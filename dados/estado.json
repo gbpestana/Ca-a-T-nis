@@ -2,27 +2,27 @@
   "iniciado": true,
   "alvos": {
     "Air Jordan 4 Retro": {
-      "leituras": 15,
+      "leituras": 16,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "Air Jordan 3 Retro": {
-      "leituras": 15,
+      "leituras": 16,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "vans crosspath": {
-      "leituras": 13,
+      "leituras": 14,
       "minimo": 799.99,
       "minimo_em": "2026-10-15T18:53-03:00"
     },
     "Jordan spizike low": {
-      "leituras": 8,
+      "leituras": 9,
       "minimo": 1299.99,
       "minimo_em": "2026-10-16T18:56-03:00"
     },
     "Adidas Campus 00": {
-      "leituras": 6,
+      "leituras": 7,
       "minimo": 499.99,
       "minimo_em": "2026-10-17T10:17-03:00"
     }
