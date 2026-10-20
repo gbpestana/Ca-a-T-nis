@@ -2,34 +2,34 @@
   "iniciado": true,
   "alvos": {
     "Air Jordan 4 Retro": {
-      "leituras": 18,
+      "leituras": 19,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "Air Jordan 3 Retro": {
-      "leituras": 18,
+      "leituras": 19,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "vans crosspath": {
-      "leituras": 16,
+      "leituras": 17,
       "minimo": 799.99,
       "minimo_em": "2026-10-15T18:53-03:00"
     },
     "Jordan spizike low": {
-      "leituras": 11,
+      "leituras": 12,
       "minimo": 1299.99,
       "minimo_em": "2026-10-16T18:56-03:00"
     },
     "Adidas Campus 00": {
-      "leituras": 9,
+      "leituras": 10,
       "minimo": 499.99,
       "minimo_em": "2026-10-17T10:17-03:00"
     }
   },
   "alertas": {},
   "pendentes": [],
-  "ultimo_resumo": "2026-10-18",
+  "ultimo_resumo": "2026-10-19",
   "esgotados": {
     "https://www.artwalk.com.br/tenis-vans-mte-crosspath-xc-masculino-d5vem-q-900/p": {
       "preco": 569.99,
@@ -65,6 +65,11 @@
       "preco": 699.99,
       "alvo": "Adidas Campus 00",
       "desde": "2026-10-17T10:17-03:00"
+    },
+    "https://www.ostore.com.br/tenis-vans-crosspath-mte-marmelade-orange-0087513000/p": {
+      "preco": 799.99,
+      "alvo": "vans crosspath",
+      "desde": "2026-10-19T22:18-03:00"
     }
   }
 }
