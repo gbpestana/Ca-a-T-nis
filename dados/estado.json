@@ -2,34 +2,34 @@
   "iniciado": true,
   "alvos": {
     "Air Jordan 4 Retro": {
-      "leituras": 41,
+      "leituras": 42,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "Air Jordan 3 Retro": {
-      "leituras": 41,
+      "leituras": 42,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "vans crosspath": {
-      "leituras": 39,
+      "leituras": 40,
       "minimo": 799.99,
       "minimo_em": "2026-10-15T18:53-03:00"
     },
     "Jordan spizike low": {
-      "leituras": 34,
+      "leituras": 35,
       "minimo": 1299.99,
       "minimo_em": "2026-10-16T18:56-03:00"
     },
     "Adidas Campus 00": {
-      "leituras": 32,
+      "leituras": 33,
       "minimo": 499.99,
       "minimo_em": "2026-10-17T10:17-03:00"
     }
   },
   "alertas": {},
   "pendentes": [],
-  "ultimo_resumo": "2026-10-26",
+  "ultimo_resumo": "2026-10-27",
   "esgotados": {
     "https://www.artwalk.com.br/tenis-vans-mte-crosspath-xc-masculino-d5vem-q-900/p": {
       "preco": 569.99,
