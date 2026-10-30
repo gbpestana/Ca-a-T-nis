@@ -2,27 +2,27 @@
   "iniciado": true,
   "alvos": {
     "Air Jordan 4 Retro": {
-      "leituras": 48,
+      "leituras": 49,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "Air Jordan 3 Retro": {
-      "leituras": 48,
+      "leituras": 49,
       "minimo": 1799.99,
       "minimo_em": "2026-10-15T18:32-03:00"
     },
     "vans crosspath": {
-      "leituras": 46,
+      "leituras": 47,
       "minimo": 799.99,
       "minimo_em": "2026-10-15T18:53-03:00"
     },
     "Jordan spizike low": {
-      "leituras": 41,
+      "leituras": 42,
       "minimo": 1299.99,
       "minimo_em": "2026-10-16T18:56-03:00"
     },
     "Adidas Campus 00": {
-      "leituras": 39,
+      "leituras": 40,
       "minimo": 499.99,
       "minimo_em": "2026-10-17T10:17-03:00"
     }
@@ -70,11 +70,6 @@
       "preco": 799.99,
       "alvo": "vans crosspath",
       "desde": "2026-10-19T22:18-03:00"
-    },
-    "https://www.artwalk.com.br/tenis-air-jordan-4-retro-og-fc-masculino-im400-2-100/p": {
-      "preco": 1799.99,
-      "alvo": "Air Jordan 4 Retro",
-      "desde": "2026-10-20T17:09-03:00"
     }
   }
 }
