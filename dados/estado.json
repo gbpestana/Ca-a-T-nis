@@ -27,7 +27,7 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 4,
+      "leituras": 5,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     }
@@ -60,6 +60,10 @@
     "https://www.authenticfeet.com.br/tenis-nike-air-force-1--07-le-masculino-cj917-9-001/p": {
       "preco": 599.99,
       "data": "2026-11-02T23:00:59.363242-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-wb-masculino-cj917-9-200/p": {
+      "preco": 649.99,
+      "data": "2026-11-04T15:15:39.234075-03:00"
     }
   },
   "pendentes": [],
