@@ -27,7 +27,7 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 6,
+      "leituras": 7,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     }
@@ -152,10 +152,10 @@
       "alvo": "Air Force 1",
       "desde": "2026-11-03T15:04-03:00"
     },
-    "https://www.artwalk.com.br/tenis-nike-air-force-1--07-masculino-im805-6-220/p": {
-      "preco": 599.99,
+    "https://www.artwalk.com.br/tenis-nike-air-force-1--07-lv8-masculino-fq871-4-302/p": {
+      "preco": 549.99,
       "alvo": "Air Force 1",
-      "desde": "2026-11-03T23:45-03:00"
+      "desde": "2026-11-05T15:19-03:00"
     }
   }
 }
