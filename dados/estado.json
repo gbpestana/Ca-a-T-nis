@@ -27,7 +27,7 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 15,
+      "leituras": 16,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     }
@@ -79,7 +79,7 @@
     }
   },
   "pendentes": [],
-  "ultimo_resumo": "2026-11-07",
+  "ultimo_resumo": "2026-11-08",
   "esgotados": {
     "https://www.artwalk.com.br/tenis-vans-mte-crosspath-xc-masculino-d5vem-q-900/p": {
       "preco": 569.99,
