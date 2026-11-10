@@ -27,7 +27,7 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 17,
+      "leituras": 18,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     }
@@ -55,11 +55,11 @@
     },
     "https://www.authenticfeet.com.br/tenis-nike-air-force-1--07-masculino-im805-6-220/p": {
       "preco": 599.99,
-      "data": "2026-11-02T23:00:59.363242-03:00"
+      "data": "2026-11-10T01:22:01.372699-03:00"
     },
     "https://www.authenticfeet.com.br/tenis-nike-air-force-1--07-le-masculino-cj917-9-001/p": {
       "preco": 599.99,
-      "data": "2026-11-02T23:00:59.363242-03:00"
+      "data": "2026-11-10T01:22:01.372699-03:00"
     },
     "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-wb-masculino-cj917-9-200/p": {
       "preco": 649.99,
@@ -76,6 +76,10 @@
     "https://www.authenticfeet.com.br/tenis-nike-air-force-1--07-lv8-masculino-fq871-4-302/p": {
       "preco": 549.99,
       "data": "2026-11-05T23:52:06.211377-03:00"
+    },
+    "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-lv8-masculino-3190055/": {
+      "preco": 499.99,
+      "data": "2026-11-10T01:22:01.372699-03:00"
     }
   },
   "pendentes": [],
