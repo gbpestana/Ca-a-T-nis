@@ -1,9 +1,9 @@
 {
-  "data": "2026-11-10T23:17-03:00",
-  "ofertas": 32,
+  "data": "2026-11-11T15:06-03:00",
+  "ofertas": 30,
   "por_loja": {
-    "artwalk": 14,
-    "authentic-feet": 17,
+    "artwalk": 13,
+    "authentic-feet": 16,
     "fila": 0,
     "magic-feet": 0,
     "mizuno": 0,
@@ -13,7 +13,7 @@
     "promobit": 0,
     "promobit:Nike": 1
   },
-  "imediatos": 0,
+  "imediatos": 1,
   "pendentes_para_resumo": 0,
   "erros": []
 }
