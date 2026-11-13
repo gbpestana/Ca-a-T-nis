@@ -27,7 +27,7 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 24,
+      "leituras": 25,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     }
@@ -184,6 +184,11 @@
       "preco": 549.99,
       "alvo": "Air Force 1",
       "desde": "2026-11-11T15:06-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1--07-lv8-masculino-ii154-9-001/p": {
+      "preco": 649.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-13T15:07-03:00"
     }
   }
 }
