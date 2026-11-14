@@ -1,5 +1,5 @@
 {
-  "data": "2026-11-13T23:43-03:00",
+  "data": "2026-11-14T13:45-03:00",
   "ofertas": 29,
   "por_loja": {
     "artwalk": 13,
@@ -13,7 +13,7 @@
     "promobit": 0,
     "promobit:Nike": 1
   },
-  "imediatos": 1,
+  "imediatos": 0,
   "pendentes_para_resumo": 0,
   "erros": []
 }
