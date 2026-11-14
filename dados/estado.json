@@ -27,7 +27,7 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 25,
+      "leituras": 26,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     }
@@ -80,10 +80,14 @@
     "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-lv8-masculino-3190055/": {
       "preco": 499.99,
       "data": "2026-11-10T01:22:01.372699-03:00"
+    },
+    "https://www.promobit.com.br/oferta/tenis-nike-sb-air-force-1-low-masculino-3211273/": {
+      "preco": 499.99,
+      "data": "2026-11-13T23:43:22.806846-03:00"
     }
   },
   "pendentes": [],
-  "ultimo_resumo": "2026-11-12",
+  "ultimo_resumo": "2026-11-13",
   "esgotados": {
     "https://www.artwalk.com.br/tenis-vans-mte-crosspath-xc-masculino-d5vem-q-900/p": {
       "preco": 569.99,
@@ -189,6 +193,11 @@
       "preco": 649.99,
       "alvo": "Air Force 1",
       "desde": "2026-11-13T15:07-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1--07-masculino-ih169-8-100/p": {
+      "preco": 549.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-13T23:43-03:00"
     }
   }
 }
