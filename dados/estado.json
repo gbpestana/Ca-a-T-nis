@@ -27,7 +27,7 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 30,
+      "leituras": 31,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     }
@@ -87,7 +87,7 @@
     }
   },
   "pendentes": [],
-  "ultimo_resumo": "2026-11-14",
+  "ultimo_resumo": "2026-11-15",
   "esgotados": {
     "https://www.artwalk.com.br/tenis-vans-mte-crosspath-xc-masculino-d5vem-q-900/p": {
       "preco": 569.99,
@@ -203,6 +203,11 @@
       "preco": 599.99,
       "alvo": "Air Force 1",
       "desde": "2026-11-14T13:45-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1--07-masculino-im805-6-220/p": {
+      "preco": 599.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-15T23:24-03:00"
     }
   }
 }
