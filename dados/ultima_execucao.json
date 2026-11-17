@@ -1,6 +1,6 @@
 {
-  "data": "2026-11-17T01:48-03:00",
-  "ofertas": 28,
+  "data": "2026-11-17T16:25-03:00",
+  "ofertas": 29,
   "por_loja": {
     "artwalk": 13,
     "authentic-feet": 14,
@@ -11,9 +11,9 @@
     "olympikus": 0,
     "ostore": 0,
     "promobit": 0,
-    "promobit:Nike": 1
+    "promobit:Nike": 2
   },
-  "imediatos": 1,
+  "imediatos": 0,
   "pendentes_para_resumo": 0,
   "erros": []
 }
