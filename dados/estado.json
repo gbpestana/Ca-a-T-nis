@@ -30,6 +30,11 @@
       "leituras": 34,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
+    },
+    "Jordan 4": {
+      "leituras": 1,
+      "minimo": 719.99,
+      "minimo_em": "2026-11-17T18:19-03:00"
     }
   },
   "alertas": {
@@ -88,6 +93,22 @@
     "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-se-3218704/": {
       "preco": 369.0,
       "data": "2026-11-16T17:41:23.716538-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-jordan-luka-4-masculino-hf082-3-600/p": {
+      "preco": 719.99,
+      "data": "2026-11-17T18:19:47.287082-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-jordan-tatum-4-se-masculino-ii380-5-300/p": {
+      "preco": 779.99,
+      "data": "2026-11-17T18:19:47.287082-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-jordan-luka-4-gone-masculino-ib790-3-100/p": {
+      "preco": 779.99,
+      "data": "2026-11-17T18:19:47.287082-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-air-jordan-4-retro-masculino-fq813-8-600/p": {
+      "preco": 1169.99,
+      "data": "2026-11-17T18:19:47.287082-03:00"
     }
   },
   "pendentes": [],
@@ -227,6 +248,11 @@
       "preco": 999.99,
       "alvo": "Air Force 1",
       "desde": "2026-11-17T01:48-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-air-jordan-4-retro-og-fc-masculino-im400-2-100/p": {
+      "preco": 1799.99,
+      "alvo": "Jordan 4",
+      "desde": "2026-11-17T18:19-03:00"
     }
   }
 }
