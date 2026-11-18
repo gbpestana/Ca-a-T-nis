@@ -27,12 +27,12 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 34,
+      "leituras": 35,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     },
     "Jordan 4": {
-      "leituras": 1,
+      "leituras": 2,
       "minimo": 719.99,
       "minimo_em": "2026-11-17T18:19-03:00"
     }
@@ -109,6 +109,10 @@
     "https://www.artwalk.com.br/tenis-air-jordan-4-retro-masculino-fq813-8-600/p": {
       "preco": 1169.99,
       "data": "2026-11-17T18:19:47.287082-03:00"
+    },
+    "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-masculino-3224951/": {
+      "preco": 450.0,
+      "data": "2026-11-18T00:54:02.601059-03:00"
     }
   },
   "pendentes": [],
