@@ -27,12 +27,12 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 41,
+      "leituras": 42,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     },
     "Jordan 4": {
-      "leituras": 8,
+      "leituras": 9,
       "minimo": 719.99,
       "minimo_em": "2026-11-17T18:19-03:00"
     }
@@ -252,6 +252,11 @@
       "preco": 1799.99,
       "alvo": "Jordan 4",
       "desde": "2026-11-17T18:19-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-wb-masculino-cj917-9-200/p": {
+      "preco": 649.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-21T14:46-03:00"
     }
   }
 }
