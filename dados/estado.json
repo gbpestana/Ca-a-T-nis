@@ -27,12 +27,12 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 47,
+      "leituras": 48,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     },
     "Jordan 4": {
-      "leituras": 14,
+      "leituras": 15,
       "minimo": 719.99,
       "minimo_em": "2026-11-17T18:19-03:00"
     }
@@ -257,6 +257,11 @@
       "preco": 649.99,
       "alvo": "Air Force 1",
       "desde": "2026-11-23T19:16-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1--07-masculino-ih169-8-200/p": {
+      "preco": 549.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-24T17:53-03:00"
     }
   }
 }
