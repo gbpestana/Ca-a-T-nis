@@ -1,8 +1,8 @@
 {
-  "data": "2026-11-25T02:03-03:00",
-  "ofertas": 35,
+  "data": "2026-11-25T17:14-03:00",
+  "ofertas": 36,
   "por_loja": {
-    "artwalk": 20,
+    "artwalk": 21,
     "authentic-feet": 15,
     "fila": 0,
     "magic-feet": 0,
@@ -12,7 +12,7 @@
     "ostore": 0,
     "promobit": 0
   },
-  "imediatos": 5,
+  "imediatos": 2,
   "pendentes_para_resumo": 0,
   "erros": []
 }

@@ -27,14 +27,14 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 49,
+      "leituras": 50,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     },
     "Jordan 4": {
-      "leituras": 16,
-      "minimo": 719.99,
-      "minimo_em": "2026-11-17T18:19-03:00"
+      "leituras": 17,
+      "minimo": 649.99,
+      "minimo_em": "2026-11-25T17:14-03:00"
     }
   },
   "alertas": {
@@ -103,8 +103,8 @@
       "data": "2026-11-25T02:03:40.949720-03:00"
     },
     "https://www.artwalk.com.br/tenis-jordan-luka-4-gone-masculino-ib790-3-100/p": {
-      "preco": 779.99,
-      "data": "2026-11-25T02:03:40.949720-03:00"
+      "preco": 649.99,
+      "data": "2026-11-25T17:14:01.223017-03:00"
     },
     "https://www.artwalk.com.br/tenis-air-jordan-4-retro-masculino-fq813-8-600/p": {
       "preco": 1169.99,
@@ -113,6 +113,10 @@
     "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-masculino-3224951/": {
       "preco": 450.0,
       "data": "2026-11-18T00:54:02.601059-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1-07-lx-masculino-im806-2-368/p": {
+      "preco": 599.99,
+      "data": "2026-11-25T17:14:01.223017-03:00"
     }
   },
   "pendentes": [],
@@ -257,6 +261,66 @@
       "preco": 549.99,
       "alvo": "Air Force 1",
       "desde": "2026-11-24T17:53-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1--07-lv8-masculino-fq871-4-302/p": {
+      "preco": 449.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1-07-unissex-hq118-0-001/p": {
+      "preco": 549.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1-07-masculino-ih169-8-200/p": {
+      "preco": 549.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-unissex-hq118-0-001/p": {
+      "preco": 549.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-masculino-ir559-9-100/p": {
+      "preco": 549.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-masculino-ih169-8-200/p": {
+      "preco": 549.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1-07-masculino-im805-6-220/p": {
+      "preco": 599.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1-07-masculino-fd976-3-101/p": {
+      "preco": 599.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-masculino-im805-6-220/p": {
+      "preco": 599.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.artwalk.com.br/tenis-nike-air-force-1-07-lv8-masculino-ii154-9-001/p": {
+      "preco": 649.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-lv8-masculino-ii154-9-001/p": {
+      "preco": 649.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-lv8-masculino-ii154-9-100/p": {
+      "preco": 649.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-25T17:14-03:00"
     }
   }
 }
