@@ -27,12 +27,12 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 50,
+      "leituras": 51,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     },
     "Jordan 4": {
-      "leituras": 17,
+      "leituras": 18,
       "minimo": 649.99,
       "minimo_em": "2026-11-25T17:14-03:00"
     }
@@ -117,6 +117,10 @@
     "https://www.artwalk.com.br/tenis-nike-air-force-1-07-lx-masculino-im806-2-368/p": {
       "preco": 599.99,
       "data": "2026-11-25T17:14:01.223017-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-wb-masculino-cj917-9-001/p": {
+      "preco": 599.99,
+      "data": "2026-11-26T01:29:28.563801-03:00"
     }
   },
   "pendentes": [],
