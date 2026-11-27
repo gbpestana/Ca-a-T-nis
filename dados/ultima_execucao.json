@@ -1,6 +1,6 @@
 {
-  "data": "2026-11-26T16:51-03:00",
-  "ofertas": 35,
+  "data": "2026-11-27T01:35-03:00",
+  "ofertas": 36,
   "por_loja": {
     "artwalk": 20,
     "authentic-feet": 15,
@@ -10,9 +10,10 @@
     "new-balance": 0,
     "olympikus": 0,
     "ostore": 0,
-    "promobit": 0
+    "promobit": 0,
+    "promobit:Nike": 1
   },
-  "imediatos": 0,
+  "imediatos": 1,
   "pendentes_para_resumo": 0,
   "erros": []
 }

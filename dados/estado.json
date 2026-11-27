@@ -27,12 +27,12 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 52,
+      "leituras": 53,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     },
     "Jordan 4": {
-      "leituras": 19,
+      "leituras": 20,
       "minimo": 649.99,
       "minimo_em": "2026-11-25T17:14-03:00"
     }
@@ -121,6 +121,10 @@
     "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-wb-masculino-cj917-9-001/p": {
       "preco": 599.99,
       "data": "2026-11-26T01:29:28.563801-03:00"
+    },
+    "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-lv8-summer-masculino-3248536/": {
+      "preco": 509.0,
+      "data": "2026-11-27T01:35:14.818346-03:00"
     }
   },
   "pendentes": [],
