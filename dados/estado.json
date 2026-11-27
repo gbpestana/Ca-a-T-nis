@@ -27,12 +27,12 @@
       "minimo_em": "2026-10-17T10:17-03:00"
     },
     "Air Force 1": {
-      "leituras": 53,
+      "leituras": 54,
       "minimo": 549.99,
       "minimo_em": "2026-11-02T23:00-03:00"
     },
     "Jordan 4": {
-      "leituras": 20,
+      "leituras": 21,
       "minimo": 649.99,
       "minimo_em": "2026-11-25T17:14-03:00"
     }
@@ -125,6 +125,10 @@
     "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-lv8-summer-masculino-3248536/": {
       "preco": 509.0,
       "data": "2026-11-27T01:35:14.818346-03:00"
+    },
+    "https://www.promobit.com.br/oferta/tenis-nike-air-force-1-07-se-3266693/": {
+      "preco": 299.0,
+      "data": "2026-11-27T16:40:06.767080-03:00"
     }
   },
   "pendentes": [],
@@ -240,11 +244,6 @@
       "alvo": "Air Force 1",
       "desde": "2026-11-16T17:41-03:00"
     },
-    "https://www.artwalk.com.br/tenis-nike-air-force-1-07-lv8-masculino-hq203-7-101/p": {
-      "preco": 899.99,
-      "alvo": "Air Force 1",
-      "desde": "2026-11-16T17:41-03:00"
-    },
     "https://www.artwalk.com.br/tenis-nike-air-force-1-low-kobe-masculino-ib001-8-007/p": {
       "preco": 999.99,
       "alvo": "Air Force 1",
@@ -324,6 +323,11 @@
       "preco": 649.99,
       "alvo": "Air Force 1",
       "desde": "2026-11-25T17:14-03:00"
+    },
+    "https://www.authenticfeet.com.br/tenis-nike-air-force-1-07-wb-masculino-cj917-9-001/p": {
+      "preco": 599.99,
+      "alvo": "Air Force 1",
+      "desde": "2026-11-27T16:40-03:00"
     }
   }
 }
